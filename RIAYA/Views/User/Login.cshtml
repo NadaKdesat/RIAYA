@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+@section Style {
+    <link rel="stylesheet" href="~/css/log_in.css" asp-append-version="true" />
+}
+<section class="container forms">
+    <div class="form login">
+        <div class="form-content">
+            <header>Login</header>
+            <form asp-controller="User" asp-action="Login" method="post">
+                <div class="field input-field">
+                    <input type="email" name="Email" placeholder="Email" class="input" required>
+                </div>
+                <div class="field input-field">
+                    <input type="password" name="Password" placeholder="Password" class="password" required>
+                </div>
+                @if (!string.IsNullOrEmpty(ViewBag.Message))
+                {
+                    <div class="alert alert-danger mt-3">@ViewBag.Message</div>
+                }
+                <div class="form-link forgot-remember">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="rememberMe" value="true" style="margin: 0;" /> Remember me
+                    </label>
+                    <a href="@Url.Action("ForgotPassword", "User")" class="forgot-pass">Forgot password?</a>
+                </div>
+                <div class="field button-field">
+                    <button>Login</button>
+                </div>
+            </form>
+            <div class="form-link">
+                <span>Don't have an account? <a asp-controller="User" asp-action="SignUp" class="link signup-link">Sign Up</a></span>
+            </div>
+        </div>
+        <div class="line"></div>
+        <div class="media-options">
+            <a href="@Url.Action("LoginWithGoogle", "User")" onclick="openGoogleLogin(event)" class="field google">
+                <img src="~/images/google.png" alt="Login with Google" class="google-img" />
+                <span>Login with Google</span>
+            </a>
+        </div>
+    </div>
+    </section>

@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RIAYA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
+    <link rel='stylesheet' href="~/css/scrllbar.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="~/images/Logo-removebg2.png" type="image/x-icon" asp-append-version="true">
+    @await RenderSectionAsync("Style", required: false)
+</head>
+<body>
+    <header>
+        @{
+            string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        }
+        <nav class="navbar">
+            <div class="logo">
+                <img src="~/images/Logo-removebg.png" alt="Logo">
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a class="@(currentAction == "Index" ? "active" : "")" href="@Url.Action("Index", "Home")">Home</a>
+                </li>
+                <li>
+                    <a class="@(currentAction == "Services" ? "active" : "")" href="@Url.Action("Services", "Service")">Services</a>
+                </li>
+                <li>
+                    <a class="@(currentAction == "KnowledgeCapsule" ? "active" : "")" href="@Url.Action("KnowledgeCapsule", "Home")">Knowledge Capsule</a>
+                </li>
+                <li>
+                    <a class="@(currentAction == "DigitalHealthAdvisor" ? "active" : "")" href="@Url.Action("DigitalHealthAdvisor", "Home")">Digital Health Advisor</a>
+                </li>
+                <!-- <li><a href="./q&a.html">Q&A</a></li> -->
+                <li>
+                    <a class="@(currentAction == "About" ? "active" : "")" href="@Url.Action("About", "Home")">About Us</a>
+                </li>
+                <li>
+                    <a class="@(currentAction == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">Contact Us</a>
+                </li>
+@*                 <li class="dropdown">
+                    <a class="@(currentAction == "Contact" ? "active dropdown-t" : "dropdown-t")" href="@Url.Action("Contact", "Home")">Help & Contact <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@Url.Action("Contact", "Home")">Contact Us</a></li>
+                        <li><a href="@Url.Action("JoinUs", "Home")">Join Us</a></li>
+                    </ul>
+                </li> *@
+                @{
+                    var isLoggedIn = Context.Session.GetString("IsLoggedIn") ?? Context.Request.Cookies["IsLoggedIn"];
+                }
+
+                @if (isLoggedIn == "true")
+                {
+                    @* <li>
+                        <a href="@Url.Action("Profile", "User")" class="@(currentAction == "Profile" ? "active" : "")">
+                            <i class="fa-solid fa-user"></i>
+                        </a>
+                    </li> *@
+
+
+                    <li class="sign-up-mobile"><a href="@Url.Action("Profile", "User")" class="sign-up">Profile</a></li>
+
+                    <li class="sign-up-mobile"><a href="@Url.Action("Logout", "User")" class="sign-up">Logout</a></li>
+                }
+                else
+                {
+                    <li class="sign-up-mobile"><a class="sign-up" asp-controller="User" asp-action="SignUp">Sign up</a></li>
+                }
+            </ul>
+            <div class="nav-icons">
+                <button class="hamburger-menu" onclick="toggleMenu()">
+                    ☰
+                </button>
+               @*  <a href="@Url.Action("Join", "Home")" class="cart-icon">
+                    <img src="~/images/shopping-cart.png" alt="Shopping Cart">
+                </a> *@
+@*                 <div class="emergency-button">
+                    <a href="@Url.Action("Join", "Home")" class="btn-emergency">
+                        <img src="~/images/siren.png" alt="Emergency Icon">
+                    </a>
+                </div> *@
+                @if (isLoggedIn == "true")
+                {
+                    <a class="sign-up" asp-controller="User" asp-action="Profile"><i class="fa-solid fa-user"></i> Profile</a>
+                    <a class="sign-up" asp-controller="User" asp-action="Logout">Logout</a>
+                }
+                else
+                {
+                    <a class="sign-up" asp-controller="User" asp-action="SignUp">Sign up</a>
+                }
+            </div>
+        </nav>
+    </header>
+    <div>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <!-- Logo and Description Section -->
+            <div class="footer-logo">
+                <img src="~/images/logo2-removebg.png" alt="Riaya Logo">
+                <p>We provide seamless access to trusted home healthcare services, tailored to your needs.</p>
+                <p class="copyrights">© 2025 RIAYA. All rights reserved.</p>
+            </div>
+
+            <!-- Our Services Section -->
+            <div class="footer-services">
+                <h4>Our Services</h4>
+                <ul>
+                    <li>Home Healthcare</li>
+                    <li>Medical Consultations</li>
+                    <li>Rapid Emergency Response</li>
+                    <li>Smart Health Assistance</li>
+                    <li>Medical Supplies Store</li>
+                    <li>Knowledge Capsule</li>
+                </ul>
+            </div>
+
+            <!-- Links Section -->
+            <div class="footer-links">
+                <h4>Links</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Services</a></li>
+                    @* <li><a href="#">Store</a></li> *@
+                    <li><a href="#">Knowledge Capsule</a></li>
+                    <li><a href="#">Digital Health Advisor</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Contacts Section -->
+            <div class="footer-contacts">
+                <h4>Quick Contacts</h4>
+                <p>Looking for assistance? We're here to help 24/7!</p>
+                <ul>
+                    <li><i class="fa-solid fa-phone"></i> +962 7 7777 7777</li>
+                    <li><i class="fa-solid fa-envelope"></i> <a href="mailto:support@riaya.com">support@riaya.com</a></li>
+                    <li><i class="fa-solid fa-location-dot"></i> 123 Healthcare Street, Amman, Jordan</li>
+                </ul>
+                <i class="fa-solid fa-arrow-right"></i><a href="https://maps.app.goo.gl/jADwFoopJgs5NyiL9" target="_blank"
+                                                          class="get-directions">Get Directions</a>
+                <div class="social-icons">
+                    <div class="Ellipse"><a href="#" style="padding:3px;"><i class="fa-brands fa-facebook-f ms-1"></i></a></div>
+                    <div class="Ellipse"><a href="#" style="padding:1px;"><i class="fa-brands fa-instagram ms-1"></i></a></div>
+                    <div class="Ellipse"><a href="#"><i class="fa-brands fa-twitter ms-1"></i></a></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/navbar.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

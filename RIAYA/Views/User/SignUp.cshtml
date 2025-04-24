@@ -1,0 +1,66 @@
+﻿@model RIAYA.Models.User
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+@section Style {
+    <link rel="stylesheet" href="~/css/sing_up.css" asp-append-version="true" />
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+}
+
+<section class="container forms">
+    <div class="form signup">
+        <div class="form-content">
+            <header>Sign Up</header>
+            <form asp-action="SignUp" asp-controller="User" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="field input-field">
+                    <input asp-for="FullName" class="input" placeholder="Full name" />
+                    <span asp-validation-for="FullName" class="error-message text-danger"></span>
+                </div>
+
+                <div class="field input-field">
+                    <input asp-for="Email" class="input" placeholder="Email" />
+                    <span asp-validation-for="Email" class="error-message text-danger"></span>
+                </div>
+
+                <div class="field input-field">
+                    <input asp-for="PasswordHash" type="password" class="input" placeholder="Password" />
+                    <span asp-validation-for="PasswordHash" class="error-message text-danger"></span>
+                </div>
+
+                <div class="field input-field">
+                    <input asp-for="ConfirmPassword" type="password" class="input" placeholder="Confirm password" />
+                    <span asp-validation-for="ConfirmPassword" class="error-message text-danger"></span>
+                </div>
+
+                <div class="field button-field">
+                    <button type="submit">Sign Up</button>
+                </div>
+            </form>
+
+            <div class="form-link">
+                <span>Already have an account? <a asp-controller="User" asp-action="Login" class="link login-link">Login</a></span>
+            </div>
+        </div>
+        <div class="line"></div>
+        <div class="media-options">
+            <a href="@Url.Action("LoginWithGoogle", "User")" onclick="openGoogleLogin(event)" class="field google">
+                <img src="~/images/google.png" alt="Login with Google" class="google-img" />
+                <span>Login with Google</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/sign_up.js" asp-append-version="true"></script>
+    <script>
+        function openGoogleLogin(event) {
+            event.preventDefault();
+            const url = event.currentTarget.getAttribute('href');
+            window.open(url, "_blank", "width=500,height=600");
+        }
+    </script>
+}

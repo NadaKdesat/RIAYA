@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Services";
+}
+@section Style {
+    <link rel="stylesheet" href='~/css/services.css' asp-append-version="true" />
+}
+
+<header class="header">
+    <h1>Home Healthcare<br> Services</h1>
+</header>
+<main class="container">
+    <div class="" style="text-align:center">
+        <h2 class="mb-3">Home Care Services Departments</h2>
+        <p>We provide health solutions to improve people's lives by offering an elite group of doctors and specialists to diagnose and treat<br /> patients in their homes.</p>
+        <br />
+    </div>
+    <section class="cards">
+        <div class="card">
+            <div class="white"></div>
+            <h3>Home Visit</h3>
+            <p>Receive medical care at home from experienced specialists, including nurses, physical therapists, and occupational therapists. Services may include treatments, rehabilitation support, or assistance with mobility.</p>
+            <button onclick="window.location.href='home_visit.html'">Request Visit</button>
+        </div>
+        <div class="card">
+            <div class="white"></div>
+            <h3>Remote Consultation</h3>
+            <p>Connect with specialized doctors via video calls or text messages for quick consultations. Get initial diagnoses, treatment advice, or referrals to specialists, all from the comfort of your home.</p>
+            <button onclick="window.location.href='remote_consultation.html'">Book Consultation</button>
+        </div>
+@*         <div class="card">
+            <div class="white"></div>
+            <h3>Emergency</h3>
+            <p>Instantly request emergency medical care or ambulance services. Your location is automatically detected via GPS to ensure a quick response during critical situations.</p>
+            <button onclick="window.location.href='emergency.html'">Request Emergency</button>
+        </div> *@
+    </section>
+</main>
+
+@section Scripts {
+    <script src='./javascript/navbar&footer.js'></script>
+    <script src='./javascript/services.js'></script>
+}

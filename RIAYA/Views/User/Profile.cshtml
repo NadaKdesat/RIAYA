@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+}
+@section Style {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+}
+
+@* <div class="container rounded bg-white mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3 border-right">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span class="font-weight-bold">Edogaru</span><span class="text-black-50">edogaru@mail.com.my</span><span> </span></div>
+        </div>
+        <div class="col-md-5 border-right">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right">Profile Settings</h4>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6"><label class="labels">Name</label><input type="text" class="form-control" placeholder="first name" value=""></div>
+                    <div class="col-md-6"><label class="labels">Surname</label><input type="text" class="form-control" value="" placeholder="surname"></div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12"><label class="labels">Mobile Number</label><input type="text" class="form-control" placeholder="enter phone number" value=""></div>
+                    <div class="col-md-12"><label class="labels">Address Line 1</label><input type="text" class="form-control" placeholder="enter address line 1" value=""></div>
+                    <div class="col-md-12"><label class="labels">Address Line 2</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+                    <div class="col-md-12"><label class="labels">Postcode</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+                    <div class="col-md-12"><label class="labels">State</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+                    <div class="col-md-12"><label class="labels">Area</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+                    <div class="col-md-12"><label class="labels">Email ID</label><input type="text" class="form-control" placeholder="enter email id" value=""></div>
+                    <div class="col-md-12"><label class="labels">Education</label><input type="text" class="form-control" placeholder="education" value=""></div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6"><label class="labels">Country</label><input type="text" class="form-control" placeholder="country" value=""></div>
+                    <div class="col-md-6"><label class="labels">State/Region</label><input type="text" class="form-control" value="" placeholder="state"></div>
+                </div>
+                <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="button">Save Profile</button></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center experience"><span>Edit Experience</span><span class="border px-3 p-1 add-experience"><i class="fa fa-plus"></i>&nbsp;Experience</span></div><br>
+                <div class="col-md-12"><label class="labels">Experience in Designing</label><input type="text" class="form-control" placeholder="experience" value=""></div> <br>
+                <div class="col-md-12"><label class="labels">Additional Details</label><input type="text" class="form-control" placeholder="additional details" value=""></div>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<div id="blur" class="mt-5">
+    @* <p id="titleProfile">Profile</p> *@
+    <div id="ahmad" class="mt-5">
+        <div id="container" class="mt-5">
+            <section id="content">
+                <!-- <button id="details">Details</button> -->
+                <img src="../Images/blank-profile-picture-973460_960_720.webp" id="yourImg" alt="">
+                <div id="namePosition">
+                    <p class="fullName" id="name"></p>
+                    <p id="position">HR Manager at Zain</p>
+                </div>
+                <!-- <div id="genderAge">
+                    <div id="gender2">
+                        <span>Gender:</span>
+                        <p class="gender" > <br>  </p>
+                    </div>
+
+                    <p id="age"><span>Age:</span> <br> 24 </p>
+                </div>
+                <hr>
+                <div id="joined">
+                    <p id="join"><span>Date Of Joining:</span> <br> 0 years 0 Months 12 Days <br> Ago</p>
+                </div>
+                <hr>
+                <div id="nationalityMobile">
+                    <p id="nationality"><span>Nationality:</span> <br> Jordanian </p>
+                    <p id="mobile"><span>Mobile:</span> <br> 0798453201</p>
+                </div> -->
+            </section>
+        </div>
+
+        <div id="form-container" class="mt-5">
+            <form action="#" method="POST" id="formContainer" >
+@*                 <div class="divs">
+                    <label class="labels" for="firstName">First Name:</label>
+                    <input disabled type="text" id="firstName" name="input1" required value="">
+                </div>
+                <div class="divs">
+                    <label class="labels" for="lastName">Last Name:</label>
+                    <input disabled type="text" id="lastName" name="input2" required value="">
+                </div> *@
+                <div class="divs">
+                    <label class="labels" for="fullName">Full Name:</label>
+                    <input class="fullName" disabled type="text" id="fullName" name="input3" required value="">
+                </div>
+                <div class="divs">
+                    <label class="labels" for="email">Email:</label>
+                    <input disabled type="text" id="email" name="input9" required value="">
+                </div>
+                <div class="divs">
+                    <label class="labels" for="mobile">Phone Number:</label>
+                    <input disabled type="text" id="mobile" name="input5" required value="">
+                </div>
+                <div class="divs">
+                    <label class="labels" for="City">City:</label>
+                    <input disabled type="text" id="City" name="input7" required value="">
+                </div>
+@*                 <div class="divs">
+                    <label class="labels" for="mobile">Phone Number:</label>
+                    <input disabled type="text" id="mobile" name="input8" required value="">
+                </div> *@
+                <!-- <button id="buttonn" onclick="edit()"> Edit Profile</button> -->
+                <input type="button" id="buttonn" onclick="edit()" value="Edit Profile">
+            </form>
+        </div>
+    </div>
+<div id="container2">
+    <div class="form">
+        <h2 id="EditTitle">Edit Profile</h2>
+        <form>
+            <label for="firstNameEdit">First Name:</label>
+            <input type="text" id="firstNameEdit" name="name" value="" placeholder="Your First Name">
+            <!-- <p id="validationResult"></p> -->
+            <label for="lastNameEdit">Last Name:</label>
+            <input type="text" id="lastNameEdit" name="title" value="Your Last Name" placeholder="Your Last Name">
+            <label for="phoneEdit">Phone:</label>
+            <input type="tel" id="phoneEdit" name="phone" value="" placeholder="Your Phone Number">
+            <label for="emailEdit">Email:</label>
+            <input type="email" id="emailEdit" name="email" value="" placeholder="example@gmail.com">
+            <label for="dateOfJoiningEdit">Date Of Joining:</label>
+            <input type="text" id="dateOfJoiningEdit" name="dateOfJoining" value="" placeholder="dd/mm/yyyy">
+            <!-- <label for="genderEdit">Gender:</label>
+            <select name="gender" id="gd">
+                <optgroup label="gender">
+                    <option value="1" selected> female </option>
+                    <option value="0" selected> male </option>
+                </optgroup>
+            </select>
+            <br> -->
+            <br>
+            <div class="genderr">
+                <p>Gender:</p>
+                <div id="MAFE">
+                    <input id="FE" type="radio" name="gender" value="Female">
+                    <label for="FE">Female</label>
+                    <input id="MA" type="radio" name="gender" value="Male">
+                    <label for="MA">Male</label>
+                </div>
+            </div>
+            <!-- <label for="imageEdit">ImageURL:</label> -->
+            <!-- <input type="text" id="imageEdit" name="gender" value=""  -->
+            <input id="cancel" onclick="saveChange()" type="button" value=" Cancel ">
+            <input id="change" onclick="saveChange()" type="submit" value="Save Changes">
+        </form>
+    </div>
+</div>
+</div>
+@section Scripts {
+    <script src="../JavaScript/profile.js" asp-append-version="true"></script>
+    <script src="../JavaScript/profileData.js" asp-append-version="true"></script>
+    <script src="../JavaScript/editProfile.js" asp-append-version="true"></script>
+}

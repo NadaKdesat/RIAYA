@@ -1,0 +1,225 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@section Style{
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+}
+
+<!--hero-->
+<section class="hero">
+    <div class="content">
+        <h1>Comprehensive Healthcare Services, Tailored for You</h1>
+        <p>
+            At RIAYA, we understand that every individual has unique health needs. Our wide range of personalized
+            services, including expert nursing care, physical therapy, and seamless virtual consultations, ensures
+            you receive top-quality care tailored to your needs—all in the comfort of your home.
+        </p>
+        <button class="btn" onclick="window.location.href='services.html'">Explore Our Services</button>
+    </div>
+    <div class="image">
+        @* <img src="./images/image (5).png" alt="Healthcare"> *@
+    </div>
+</section>
+<!--end hero-->
+
+<!--About Us-->
+<div class="about-container">
+    <div class="image-wrapper">
+        <img src="~/images/Why_Choose_Us_section.jpg" alt="Healthcare Image">
+    </div>
+    <div class="text-content">
+        <h4>About us</h4>
+        <h2>Because Everyone Deserves Care</h2>
+        <p>
+            RIAYA connects you with trusted nurses, therapists, and caregivers — offering personalized care at home, when you need it most.
+            Simple, human, and always by your side.
+        </p>
+        @* <p>Whether you need a nurse, a physical therapist, or just someone to guide you through recovery, RIAYA connects you with trusted professionals who truly care. Simple, human, and always by your side.</p> *@
+        <button>Read More</button>
+        <hr />
+        <div class="row border-top border-color-light-black mt-1-4" style="margin:auto; color:#053D76;">
+            <div class="col-sm-6 col-md-4 mb-4 mb-md-0">
+                <h3 class="h1"><span class="countup">30</span>+</h3>
+                <p class="mb-0">Awards Win</p>
+            </div>
+            <div class="col-sm-6 col-md-4 mb-4 mb-md-0">
+                <h3 class="h1"><span class="countup">100</span>+</h3>
+                <p class="mb-0">Experience Members</p>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <h3 class="h1"><span class="countup">15</span>k</h3>
+                <p class="mb-0">Satisfied Clients</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End About Us-->
+<!--services-->
+<section class="services-section">
+    <h4>Our Services</h4>
+    <h2>Why Choose Us.</h2>
+
+    @* <div class="services-grid">
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/house.png" alt="Medical Accessories">
+                <a href="#"><h3>Home Healthcare</h3></a>
+            </div>
+            <p>Receive tailored healthcare services at home, designed to meet your unique needs.</p>
+        </div>
+
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/doctor (2).png" alt="Covid Treatment">
+                <a href="#"><h3>Medical Consultations</h3></a>
+            </div>
+            <p>Access round-the-clock consultations with specialized doctors via video or text.</p>
+        </div>
+
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/ambulance.png" alt="Emergency Care">
+                <a href="#"><h3>Rapid Emergency Response</h3></a>
+            </div>
+            <p>A one-tap emergency button with GPS to ensure fast assistance from caregivers or ambulance services.</p>
+        </div>
+
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/chatbot.png" alt="Consultations">
+                <a href="#"><h3>Smart Health Assistance</h3></a>
+            </div>
+            <p>Leverage AI to diagnose symptoms, offer medical advice, and analyze medical images instantly.</p>
+        </div>
+
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/shopping-cart (2).png" alt="Qualified Products">
+                <a href="#"><h3>Medical Supplies Store</h3></a>
+            </div>
+            <p>Shop for high-quality medical devices and supplies with doorstep delivery.</p>
+        </div>
+
+        <div class="service-box">
+            <div class="flex">
+            <img src="~/images/open-book.png" alt="Self Protection Kit">
+                <a href="#"><h3>Knowledge Capsule</h3></a>
+            </div>
+            <p>Explore a rich library of educational articles and videos to empower your health journey.</p>
+        </div>
+    </div> *@
+
+    <div class="row mt-n1-9 center">
+        <div class="col-md-6 col-lg-3 mt-1-9 wow fadeIn" data-wow-delay="200ms" style="visibility: visible; animation-delay: 200ms; animation-name: fadeIn;">
+            <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/home-service.jpg" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-9 pt-2-3">
+                    <i class="fa-solid fa-house-medical card-icon display-23"></i>
+                    <h3 class="h5 mb-3"><a href="vaccination.html">Home Care</a></h3>
+                    <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mt-1-9 wow fadeIn" data-wow-delay="400ms" style="visibility: visible; animation-delay: 400ms; animation-name: fadeIn;">
+            <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/Tele_image.png" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-9 pt-2-3">
+                    <i class="fa-solid fa-bolt card-icon display-23"></i>
+                    <h3 class="h5 mb-3"><a href="cardiology.html">Instant Service</a></h3>
+                    <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mt-1-9 wow fadeIn" data-wow-delay="600ms" style="visibility: visible; animation-delay: 600ms; animation-name: fadeIn;">
+            <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/Tele_image.png" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-9 pt-2-3">
+                    <i class="fa-solid fa-user-doctor card-icon display-23"></i>
+                    <h3 class="h5 mb-3"><a href="family-physician.html">Electronic Consultations</a></h3>
+                    <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mt-1-9 wow fadeIn" data-wow-delay="800ms" style="visibility: visible; animation-delay: 800ms; animation-name: fadeIn;">
+            <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/service-04.jpg" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-9 pt-2-3">
+                    <i class="fa-solid fa-robot card-icon display-23"></i>
+                    <h3 class="h5 mb-3"><a href="emergency-care.html">Digital Health Advisor</a></h3>
+                    <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--End services-->
+<!--Blogs-->
+<section class="blogs-section">
+    <p class="section-title">News & Blogs</p>
+    <h2 class="section-subtitle">Latest News Feeds</h2>
+
+    <div class="row mt-n1-9">
+
+        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="200ms" style="visibility: visible; animation-delay: 200ms; animation-name: fadeIn;">
+            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/blog-01.jpg" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                    <span class="card-icon font-weight-700">08 May</span>
+                    <div class="mb-3">
+                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Hospital</a></span>
+                    </div>
+                    <h3 class="h4 mb-3"><a href="blog-details.html">Why are children so obsessed with hospital.</a></h3>
+                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="400ms" style="visibility: visible; animation-delay: 400ms; animation-name: fadeIn;">
+            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                    <span class="card-icon font-weight-700">04 May</span>
+                    <div class="mb-3">
+                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                    </div>
+                    <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
+                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="600ms" style="visibility: visible; animation-delay: 600ms; animation-name: fadeIn;">
+            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                <div class="card-image">
+                    <img src="~/images/blog-03.jpg" class="border-top-10-radius" alt="...">
+                </div>
+                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                    <span class="card-icon font-weight-700">01 May</span>
+                    <div class="mb-3">
+                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Surgery</a></span>
+                    </div>
+                    <h3 class="h4 mb-3"><a href="blog-details.html">Five doubts you should clarify about surgery.</a></h3>
+                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</section>
+<!--End Blogs-->
+
+@section Scripts{
+
+}
