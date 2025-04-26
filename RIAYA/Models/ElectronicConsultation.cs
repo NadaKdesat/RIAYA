@@ -23,6 +23,8 @@ public partial class ElectronicConsultation
 
     public bool? IsConfirmed { get; set; }
 
+    public string? PatientConditionDescription { get; set; }
+
     public string? ConsultationLink { get; set; }
 
     public DateTime? CreatedAt { get; set; }

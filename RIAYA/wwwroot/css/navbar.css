@@ -7,9 +7,9 @@ body {
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Navbar Styling */
@@ -107,17 +107,17 @@ ol, ul {
 }
 
 .btn-emergency {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 43px;
-  height: 43px;
-  background-color: #FF1500;
-  border-radius: 50%;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), inset 2px 2px 6px rgba(0, 0, 0, 0.3);
-  border: none;
-  text-decoration: none;
-  position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    background-color: #053D76;
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), inset 2px 2px 6px rgba(0, 0, 0, 0.3);
+    border: none;
+    text-decoration: none;
+    position: relative;
 }
 
 .btn-emergency img {
@@ -153,6 +153,10 @@ ol, ul {
 .sign-up:hover {
   background-color: #03325d;
   color:white;
+}
+
+.profile {
+    display: none;
 }
 
 .hamburger-menu {
@@ -310,6 +314,18 @@ ol, ul {
   .nav-icons .sign-up {
     display: none;
   }
+    .nav-icons .profile-icon {
+        display: none;
+    }
+
+    .nav-icons .profile-icon {
+        display: none;
+    }
+
+    .profile {
+        display: block;
+    }
+
 
   .nav-icons {
     margin-left: 0px;

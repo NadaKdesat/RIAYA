@@ -18,8 +18,8 @@
         <div class="card">
             <div class="white"></div>
             <h3>Home Visit</h3>
-            <p>Receive medical care at home from experienced specialists, including nurses, physical therapists, and occupational therapists. Services may include treatments, rehabilitation support, or assistance with mobility.</p>
-            <button onclick="window.location.href='home_visit.html'">Request Visit</button>
+            <p>Explore a range of home care services provided by our experienced specialists — including urgent care and scheduled visits. Choose the option that best fits your medical needs and enjoy professional care in the comfort of your home.</p>
+            <button type="button" onclick="window.location.href='@Url.Action("HomeVisitOptions", "Service")'">Explore Options</button>
         </div>
         <div class="card">
             <div class="white"></div>
@@ -27,16 +27,9 @@
             <p>Connect with specialized doctors via video calls or text messages for quick consultations. Get initial diagnoses, treatment advice, or referrals to specialists, all from the comfort of your home.</p>
             <button onclick="window.location.href='remote_consultation.html'">Book Consultation</button>
         </div>
-@*         <div class="card">
-            <div class="white"></div>
-            <h3>Emergency</h3>
-            <p>Instantly request emergency medical care or ambulance services. Your location is automatically detected via GPS to ensure a quick response during critical situations.</p>
-            <button onclick="window.location.href='emergency.html'">Request Emergency</button>
-        </div> *@
     </section>
 </main>
 
 @section Scripts {
-    <script src='./javascript/navbar&footer.js'></script>
     <script src='./javascript/services.js'></script>
 }

@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Home Visit Options";
+}
+@section Style {
+    <link rel="stylesheet" href='~/css/homeVisitOptions.css' asp-append-version="true" />
+}
+
+<header class="header">
+    <h1>Home Visit Options</h1>
+</header>
+<main class="container">
+    <div style="text-align:center">
+        <h2 class="mb-3">Choose Your Home Visit Service</h2>
+        <p>Select the type of home visit service that best fits your needs. Whether you need urgent care or a scheduled visit, we’re here for you.</p>
+        <br />
+    </div>
+    <section class="cards">
+        <div class="card">
+            <div class="white"></div>
+            <h3>Instant Home Care Appointments</h3>
+            <p>Get urgent medical assistance at your home as soon as possible. Perfect for cases requiring quick but non-emergency attention.</p>
+            <button type="button" onclick="window.location.href='@Url.Action("instant_homecare", "Service")'">Request Now</button>
+        </div>
+        <div class="card">
+            <div class="white"></div>
+            <h3>Home Care Appointments</h3>
+            <p>Book a scheduled home visit at your convenience. Ideal for follow-ups, therapy sessions, and general checkups.</p>
+            <button type="button" onclick="window.location.href='@Url.Action("scheduled_homecare", "Service")'">Book Appointment</button>
+        </div>
+    </section>
+</main>
+
+
+<div id="instantCareModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="form-step-1">
+            <h2>Instant Home Care Request</h2>
+            <form id="instantCareForm">
+                <input type="text" name="PatientFullName" placeholder="Full Name" required />
+                <select name="PatientGender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <input type="date" name="PatientBirthDate" required />
+                <input type="datetime-local" name="AppointmentTime" required />
+                <input type="text" name="LocationType" placeholder="Location Type" />
+                <input type="text" name="BuildingName" placeholder="Building Name" />
+                <input type="text" name="FloorNumber" placeholder="Floor Number" />
+                <input type="text" name="ApartmentNumber" placeholder="Apartment Number" />
+                <input type="text" name="Street" placeholder="Street" />
+                <input type="tel" name="ContactPhone" placeholder="Contact Phone" required />
+                <button type="button" onclick="goToPayment()">Next</button>
+            </form>
+        </div>
+
+        <div id="form-step-2" class="hidden">
+            <h2>Payment</h2>
+            <p>Service: Instant Home Care</p>
+            <p>Price: 20 JOD</p>
+            <input type="text" placeholder="Card Number" required />
+            <input type="text" placeholder="Expiry Date" required />
+            <input type="text" placeholder="CVV" required />
+            <button type="button" onclick="submitForm()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+    function openInstantCareModal() {
+    document.getElementById("instantCareModal").classList.remove("hidden");
+}
+
+function closeModal() {
+    document.getElementById("instantCareModal").classList.add("hidden");
+}
+
+function goToPayment() {
+    document.getElementById("form-step-1").classList.add("hidden");
+    document.getElementById("form-step-2").classList.remove("hidden");
+}
+
+function submitForm() {
+    const form = document.getElementById("instantCareForm");
+    const formData = new FormData(form);
+
+    fetch('/Service/SubmitInstantCare', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            alert("Appointment Confirmed!");
+            closeModal();
+        } else {
+            alert("Something went wrong.");
+        }
+    });
+}
+    </script>
+}

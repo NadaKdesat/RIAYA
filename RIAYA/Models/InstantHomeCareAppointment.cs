@@ -37,9 +37,11 @@ public partial class InstantHomeCareAppointment
 
     public string? ApartmentNumber { get; set; }
 
-    public string? Street { get; set; }
+    public string? StreetName { get; set; }
 
     public string? ContactPhone { get; set; }
+
+    public string? PatientConditionDescription { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

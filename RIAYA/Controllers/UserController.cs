@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.Extensions.Options;
 
 namespace RIAYA.Controllers
 {
@@ -264,10 +265,103 @@ namespace RIAYA.Controllers
             return (object?)_context.Users.FirstOrDefault(e => e.Email == email);
         }
 
+
+
+
         public IActionResult Profile()
         {
+            string fullName = HttpContext.Session.GetString("FullName")
+                              ?? Request.Cookies["FullName"]
+                              ?? "";
+
+            string email = HttpContext.Session.GetString("UserEmail")
+                           ?? Request.Cookies["UserEmail"]
+                           ?? "";
+
+            string phone = HttpContext.Session.GetString("Phone")
+                           ?? Request.Cookies["Phone"]
+                           ?? "";
+
+            string city = HttpContext.Session.GetString("City")
+                          ?? Request.Cookies["City"]
+                          ?? "";
+
+            ViewBag.FullName = fullName;
+            ViewBag.Email = email;
+            ViewBag.Phone = phone;
+            ViewBag.City = city;
+
             return View();
         }
+
+        [HttpPost]
+        public IActionResult UpdateProfile(string FullName, string Email, string Phone, string City)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail")
+                           ?? Request.Cookies["UserEmail"]
+                           ?? "";
+            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+            if (user != null)
+            {
+                user.FullName = FullName;
+                user.Email = Email;
+                user.Phone = Phone;
+                user.City = City;
+                _context.SaveChanges();
+
+                HttpContext.Session.SetString("FullName", FullName);
+                HttpContext.Session.SetString("Phone", Phone);
+                HttpContext.Session.SetString("City", City);
+
+                CookieOptions option = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(7),
+                    HttpOnly = true
+                };
+                Response.Cookies.Append("FullName", FullName, option);
+                Response.Cookies.Append("Phone", Phone, option);
+                Response.Cookies.Append("City", City, option);
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [HttpPost]
+        public IActionResult ChangePassword(string CurrentPassword, string NewPassword, string ConfirmPassword)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail")
+                           ?? Request.Cookies["UserEmail"]
+                           ?? "";
+            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+
+            if (user != null && BCrypt.Net.BCrypt.Verify(CurrentPassword, user.PasswordHash))
+            {
+                if (NewPassword == ConfirmPassword)
+                {
+                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NewPassword);
+                    _context.SaveChanges();
+
+                    // Return success response as JSON
+                    ViewBag.successMessage = "Password changed successfully!";
+                    return Json(new { success = true, message = "Password changed successfully!" });
+                }
+                else
+                {
+                    ViewBag.errorMessage= "The new passwords do not match.";
+                    // Return error response as JSON
+                    return Json(new { success = false, message = "The new passwords do not match." });
+                }
+            }
+            else
+            {
+                ViewBag.errorMessage = "Current password is incorrect.";
+                // Return error response as JSON
+                return Json(new { success = false, message = "Current password is incorrect." });
+            }
+        }
+
+
+
 
         public IActionResult Logout()
         {

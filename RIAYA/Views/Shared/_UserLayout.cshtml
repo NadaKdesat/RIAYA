@@ -28,15 +28,17 @@
                     <a class="@(currentAction == "Index" ? "active" : "")" href="@Url.Action("Index", "Home")">Home</a>
                 </li>
                 <li>
-                    <a class="@(currentAction == "Services" ? "active" : "")" href="@Url.Action("Services", "Service")">Services</a>
+                    <a class="@(currentAction == "Services" || currentAction == "HomeVisitOptions" ? "active" : "")" href="@Url.Action("Services", "Service")">Services</a>
                 </li>
                 <li>
-                    <a class="@(currentAction == "KnowledgeCapsule" ? "active" : "")" href="@Url.Action("KnowledgeCapsule", "Home")">Knowledge Capsule</a>
+                    <a class="@(currentAction == "DigitalHealthAdvisor" ? "active" : "")" href="@Url.Action("DigitalHealthAdvisor", "Service")">Digital Health Advisor</a>
                 </li>
                 <li>
-                    <a class="@(currentAction == "DigitalHealthAdvisor" ? "active" : "")" href="@Url.Action("DigitalHealthAdvisor", "Home")">Digital Health Advisor</a>
+                    <a class="@(currentAction == "KnowledgeCapsule" ? "active" : "")" href="@Url.Action("KnowledgeCapsule", "Home")">Knowledge Capsules</a>
                 </li>
-                <!-- <li><a href="./q&a.html">Q&A</a></li> -->
+                <li>
+                    <a class="@(currentAction == "HealthcareTeam" ? "active" : "")" href="@Url.Action("HealthcareTeam", "Home")">Our Healthcare Team</a>
+                </li>
                 <li>
                     <a class="@(currentAction == "About" ? "active" : "")" href="@Url.Action("About", "Home")">About Us</a>
                 </li>
@@ -56,14 +58,7 @@
 
                 @if (isLoggedIn == "true")
                 {
-                    @* <li>
-                        <a href="@Url.Action("Profile", "User")" class="@(currentAction == "Profile" ? "active" : "")">
-                            <i class="fa-solid fa-user"></i>
-                        </a>
-                    </li> *@
-
-
-                    <li class="sign-up-mobile"><a href="@Url.Action("Profile", "User")" class="sign-up">Profile</a></li>
+                    <li><a class="profile" href="@Url.Action("Profile", "User")">Profile</a></li>
 
                     <li class="sign-up-mobile"><a href="@Url.Action("Logout", "User")" class="sign-up">Logout</a></li>
                 }
@@ -76,17 +71,9 @@
                 <button class="hamburger-menu" onclick="toggleMenu()">
                     ☰
                 </button>
-               @*  <a href="@Url.Action("Join", "Home")" class="cart-icon">
-                    <img src="~/images/shopping-cart.png" alt="Shopping Cart">
-                </a> *@
-@*                 <div class="emergency-button">
-                    <a href="@Url.Action("Join", "Home")" class="btn-emergency">
-                        <img src="~/images/siren.png" alt="Emergency Icon">
-                    </a>
-                </div> *@
                 @if (isLoggedIn == "true")
                 {
-                    <a class="sign-up" asp-controller="User" asp-action="Profile"><i class="fa-solid fa-user"></i> Profile</a>
+                    <a class="profile-icon" asp-controller="User" asp-action="Profile" style="color:#053D76; font-size:21px;"><i class="fa-solid fa-user"></i></a>
                     <a class="sign-up" asp-controller="User" asp-action="Logout">Logout</a>
                 }
                 else

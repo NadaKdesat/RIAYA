@@ -74,7 +74,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<ElectronicConsultation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC07757979B3");
+            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC073F50C024");
 
             entity.Property(e => e.AppointmentTime).HasColumnType("datetime");
             entity.Property(e => e.ConsultationLink).HasMaxLength(500);
@@ -87,15 +87,15 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Electroni__Patie__4E88ABD4");
+                .HasConstraintName("FK__Electroni__Patie__160F4887");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__Electroni__Provi__4F7CD00D");
+                .HasConstraintName("FK__Electroni__Provi__17036CC0");
 
             entity.HasOne(d => d.Service).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__Electroni__Servi__5070F446");
+                .HasConstraintName("FK__Electroni__Servi__17F790F9");
         });
 
         modelBuilder.Entity<HealthBlog>(entity =>
@@ -116,7 +116,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<HomeCareAppointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC07B970B17B");
+            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC07070FBAC2");
 
             entity.Property(e => e.ApartmentNumber).HasMaxLength(50);
             entity.Property(e => e.AppointmentTime).HasColumnType("datetime");
@@ -132,24 +132,24 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.PatientFullName).HasMaxLength(100);
             entity.Property(e => e.PatientGender).HasMaxLength(10);
-            entity.Property(e => e.Street).HasMaxLength(100);
+            entity.Property(e => e.StreetName).HasMaxLength(100);
 
             entity.HasOne(d => d.Patient).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__HomeCareA__Patie__5535A963");
+                .HasConstraintName("FK__HomeCareA__Patie__1DB06A4F");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__HomeCareA__Provi__5629CD9C");
+                .HasConstraintName("FK__HomeCareA__Provi__1EA48E88");
 
             entity.HasOne(d => d.Service).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__HomeCareA__Servi__571DF1D5");
+                .HasConstraintName("FK__HomeCareA__Servi__1F98B2C1");
         });
 
         modelBuilder.Entity<InstantHomeCareAppointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InstantH__3214EC07FACDEE43");
+            entity.HasKey(e => e.Id).HasName("PK__InstantH__3214EC07F42526DC");
 
             entity.Property(e => e.ApartmentNumber).HasMaxLength(50);
             entity.Property(e => e.AppointmentTime)
@@ -170,19 +170,19 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasDefaultValue("Pending");
-            entity.Property(e => e.Street).HasMaxLength(100);
+            entity.Property(e => e.StreetName).HasMaxLength(100);
 
             entity.HasOne(d => d.Patient).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__InstantHo__Patie__5BE2A6F2");
+                .HasConstraintName("FK__InstantHo__Patie__245D67DE");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__InstantHo__Provi__5DCAEF64");
+                .HasConstraintName("FK__InstantHo__Provi__2645B050");
 
             entity.HasOne(d => d.Service).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__InstantHo__Servi__5CD6CB2B");
+                .HasConstraintName("FK__InstantHo__Servi__25518C17");
         });
 
         modelBuilder.Entity<JoinU>(entity =>

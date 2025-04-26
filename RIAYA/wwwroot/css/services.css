@@ -31,7 +31,7 @@ body {
   background: url(../images/[freepicdownloader.com]-headphones-with-date-calendar-page-gray-background-health-care-concept-large.jpg) no-repeat center center/cover;
   background-color: #053D76;
   color: white;
-  padding: 13rem 1rem;
+  padding: 14rem 2rem;
   text-align: left;
 }
 
@@ -83,12 +83,13 @@ body {
 }
 
 .card {
-  position: relative;
-  background: white;
-  border: 2.4px solid #053D76;
-  box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  text-align: left;
+    position: relative;
+    background: white;
+    border: 2.4px solid #053D76;
+    box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    text-align: left;
+    height: 260px;
 }
 
 /*.card:nth-child(1){
@@ -131,6 +132,9 @@ body {
 }*/
 
     .card button {
+        position:absolute;
+        bottom:1.5rem;
+        left:1.5rem;
         background-color: #DB0000;
         color: white;
         border: none;

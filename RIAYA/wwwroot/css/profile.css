@@ -1,55 +1,6 @@
-﻿/*body {
-    background: #053D76;
-}
+﻿@import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=DM+Serif+Text:ital@0;1&family=Fredoka:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Stick+No+Bills:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=DM+Serif+Text:ital@0;1&family=Fredoka:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Stick+No+Bills:wght@200..800&display=swap');
 
-.container{
-    margin-top:200px;
-}
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: #BA68C8
-}
-
-.profile-button {
-    background: #053D76;
-    box-shadow: none;
-    border: none
-}
-
-    .profile-button:hover {
-        background: #053D76
-    }
-
-    .profile-button:focus {
-        background: #053D76;
-        box-shadow: none
-    }
-
-    .profile-button:active {
-        background: #053D76;
-        box-shadow: none
-    }
-
-.back:hover {
-    color: #682773;
-    cursor: pointer
-}
-
-.labels {
-    font-size: 11px
-}
-
-.add-experience:hover {
-    background: #BA68C8;
-    color: #fff;
-    cursor: pointer;
-    border: solid 1px #BA68C8
-}
-*/
-
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 html,
 body {
     margin: 0;
@@ -65,77 +16,37 @@ body {
 
 body {
     overflow-y: scroll;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-* {
-    font-family: "Open Sans", sans-serif;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
     background-color: #F5F5F5;
 }
 
-#ahmad {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Lato';
+}
+
+.navbar {
+    position: static;
+}
+.center{
+    margin:auto;
+
+}
+.content-wrapper {
     display: flex;
-    margin-bottom: 5em;
+    justify-content: center;
 }
 
-#titleProfile {
-    margin-top: 1.25em;
-    text-align: center;
-    color: #003366;
-    font-size: 3em;
-    font-weight: 800;
-    width: 100%;
-    background-color: #F5F5F5;
-    height: 2em;
-    align-content: center;
-    text-shadow: 0 0.4375em 0.375em rgba(0, 0, 0, 0.2);
+.flex {
+    display: flex;
+    gap: 30px;
+    flex-direction:column;
 }
 
-div #container {
-    display: grid;
-    gap: 0.625em;
-    /* margin-left: 3em; */
-    /* width: 20em; */
-    height: 10em !important;
-}
-
-#content {
-    /* width: 20em; */
-    margin-top: 2em;
-    background-color: #F5F5F5;
-    color: white;
-    margin-left: 1em;
-    height: 10em !important;
-    width: 20em;
-    height: 20em;
-}
-
-    #content span {
-        font-weight: 650;
-        text-align: center;
-    }
-
-    #content p {
-        font-weight: 100;
-    }
-
-#yourImg {
-    /* position: relative;
-    width: 0.5em;
-    height: 3em; */
-    width: 20em;
-    height: 20em;
+.ProfileImg {
+    width: 15vw;
+    height: 15vw;
 }
 
 #namePosition {
@@ -146,8 +57,6 @@ div #container {
     margin-bottom: -0.57em;
     padding-top: 1em;
     padding-bottom: 1em;
-    /* width: 0.5em;
-    height: 2em; */
 }
 
 p#name {
@@ -155,50 +64,19 @@ p#name {
     font-weight: 500;
 }
 
-
-/* #details{
-    background-color: #003366;
-    height: 2em;
-    width: 4em;
-    font-size: large;
-    font-weight: 650;
-    color: white;
-    box-shadow: 0 0 0.625em rgba(0, 0, 0, 0.1);
-}
-#details.hidden {
-    opacity: 0; 
-    pointer-events: none; 
-    display: none;
-}
-#yourImg, #namePosition {
-    transition: all 3s ease;
-    display: none;
-}
-#namePosition {
-    height: 3em; 
-    overflow: hidden;
-}
-#namePosition.expanded {
-    display: block;
-    height: 6.625em;
-}
-
- */
-
 /* Additional Form Styles */
 #form-container {
     background-color: #F5F5F5;
-    padding: 1.25em;
-    /* border-radius: 1em; */
+    padding: 20px;
     box-shadow: 0 0 0.625em rgba(0, 0, 0, 0.1);
-    width: 70em;
+    width: 53vw;
     margin-left: 0;
     margin-top: 2em;
-    /* height: 43em; */
+    margin-bottom: 2em;
 }
 
     #form-container input {
-        /* width: 20em; */
+        width: 50vw;
         padding: 0.625em;
         font-size: 0.9375em;
         font-weight: 500;
@@ -207,6 +85,7 @@ p#name {
         border-radius: 0.3125em;
         margin-bottom: 0.625em;
         box-sizing: border-box;
+/*        margin: auto;*/
     }
 
 #buttonn {
@@ -222,10 +101,10 @@ p#name {
 }
 
 #buttonn {
-    position: relative;
+/*    position: relative;
     left: 65em;
-    top: 0.5em;
-    cursor: default !important;
+    top: 0.5em;*/
+    cursor:pointer !important;
 }
 
 .divs {
@@ -374,22 +253,6 @@ h2#EditTitle {
 label {
     display: block;
 }
-/* select {
-    width: 200px;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    box-sizing: border-box; /* Ensures padding is included in width 
-} */
-/* Optional: Style the optgroup and options */
-/* optgroup {
-    font-style: italic;
-}
-option {
-    padding: 5px;
-}  */
 
 .form {
     display: flex;
@@ -500,7 +363,7 @@ p {
         flex-direction: column;
         flex-wrap: wrap;
         justify-content: space-evenly;
-        width: 20em !important;
+/*        width: 20em !important;*/
     }
 
     input#cancel {
@@ -562,4 +425,28 @@ p {
         box-shadow: 0 0 0.625em rgba(0, 0, 0, 0.1);
         height: 39em;
     }
+}
+
+.modal-footer {
+    padding: 0px;
+    padding-top: 20px;
+}
+
+.button-group input {
+    width: 10vw !important;
+    margin: 10px;
+    background-color: #053D76;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    .button-group input:hover {
+        background-color: #03325d;
+    }
+
+.row {
+    display: flex;
+    justify-content: flex-end
 }
