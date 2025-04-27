@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿    using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Scripting;
@@ -266,8 +266,6 @@ namespace RIAYA.Controllers
         }
 
 
-
-
         public IActionResult Profile()
         {
             string fullName = HttpContext.Session.GetString("FullName")
@@ -359,9 +357,6 @@ namespace RIAYA.Controllers
                 return Json(new { success = false, message = "Current password is incorrect." });
             }
         }
-
-
-
 
         public IActionResult Logout()
         {

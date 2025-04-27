@@ -9,6 +9,8 @@ public partial class ServiceCategory
 
     public string? CategoryName { get; set; }
 
+    public string? CategoryDescription { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public virtual ICollection<Provider> Providers { get; set; } = new List<Provider>();

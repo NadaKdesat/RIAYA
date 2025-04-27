@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="~/images/Logo-removebg2.png" type="image/x-icon" asp-append-version="true">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2EG8zyN2QeW9JLRkFZJ9e+H0QnWYx0bsjzC4S+I=" crossorigin="" />
+    <!-- إضافة JavaScript الخاص بـ Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kPj4U5Z3YgD4h5kW9d4KwxQeASkgrHj6l+7U8=" crossorigin=""></script>
+
     @await RenderSectionAsync("Style", required: false)
 </head>
 <body>
@@ -148,6 +152,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/navbar.js" asp-append-version="true"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o3Zm00B3as0xZaa9dGeL/5l5B1DN3ddZzDR3b8hSR78=" crossorigin=""></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

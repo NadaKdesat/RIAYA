@@ -19,6 +19,10 @@ public partial class ElectronicConsultation
 
     public DateOnly? PatientBirthDate { get; set; }
 
+    public string? CategoryName { get; set; }
+
+    public string? ServiceName { get; set; }
+
     public DateTime? AppointmentTime { get; set; }
 
     public bool? IsConfirmed { get; set; }

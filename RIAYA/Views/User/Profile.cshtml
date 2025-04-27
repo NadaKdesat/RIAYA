@@ -58,7 +58,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="phoneEdit" class="form-label">Phone</label>
-                            <input type="tel" class="form-control" id="phoneEdit" name="Phone" value="@ViewBag.Phone" required>
+                            <input type="tel" class="form-control" id="phoneEdit" name="Phone" value="@ViewBag.Phone" pattern="^07[789]\d{7}$" required>
                         </div>
                         <div class="mb-3">
                             <label for="cityEdit" class="form-label">City</label>
