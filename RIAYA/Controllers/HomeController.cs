@@ -21,6 +21,26 @@ namespace RIAYA.Controllers
 
         public IActionResult Index()
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("IsLoggedIn")) && Request.Cookies.ContainsKey("IsLoggedIn"))
+            {
+                var userType = Request.Cookies["UserType"];
+
+                if (!string.IsNullOrEmpty(userType))
+                {
+                    switch (userType.ToLower())
+                    {
+                        case "admin":
+                            return RedirectToAction("AdminDashboard", "Admin");
+                        case "provider":
+                            return RedirectToAction("ProviderDashboard", "Provider");
+                        case "user":
+                            return RedirectToAction("Index", "Home");
+                        default:
+                            break;
+                    }
+                }
+            }
+
             return View();
         }
 

@@ -12,7 +12,33 @@ namespace RIAYA.Controllers
             _context = context;
         }
 
-        public IActionResult Dashboard()
+        public IActionResult AdminDashboard()
+        {
+            return View();
+        }
+
+        public IActionResult Providers()
+        {
+            return View();
+        }
+
+        public IActionResult Users()
+        {
+            return View();
+        }
+        public IActionResult Categories()
+        {
+            return View();
+        }
+        public IActionResult Reservations()
+        {
+            return View();
+        }
+        public IActionResult ContactUs()
+        {
+            return View();
+        }
+        public IActionResult HealthBlogs()
         {
             return View();
         }

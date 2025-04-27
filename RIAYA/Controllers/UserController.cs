@@ -97,7 +97,8 @@ namespace RIAYA.Controllers
                             {
                                 Expires = DateTime.Now.AddDays(7), 
                                 IsEssential = true,
-                                HttpOnly = true 
+                                HttpOnly = true,
+                                Secure = true
                             };
                             Response.Cookies.Append("IsLoggedIn", "true", options);
                             Response.Cookies.Append("UserId", user.Id.ToString(), options);
