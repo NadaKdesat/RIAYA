@@ -26,7 +26,7 @@ body, html {
 }
 
     .sidebar .logo {
-        width:140px;
+        width:125px;
         margin-bottom: 20px;
     }
 
@@ -181,11 +181,6 @@ body, html {
     left: 0;
     top: 0;
 }
-
-    .sidebar .logo {
-        width: 140px;
-        margin-bottom: 20px;
-    }
 
     .sidebar .nav-link {
         color: #053D76;

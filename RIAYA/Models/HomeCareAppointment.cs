@@ -23,7 +23,9 @@ public partial class HomeCareAppointment
 
     public string? ServiceName { get; set; }
 
-    public DateTime? AppointmentTime { get; set; }
+    public DateOnly AppointmentDate { get; set; }
+
+    public TimeOnly AppointmentTime { get; set; }
 
     public bool? IsConfirmed { get; set; }
 

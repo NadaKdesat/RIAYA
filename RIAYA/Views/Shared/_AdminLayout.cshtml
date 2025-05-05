@@ -27,7 +27,7 @@
                     <button class="close-sidebar" type="button" data-bs-dismiss="sidebar">
                         <i class="fas fa-times"></i>
                     </button>
-                    <img src="~/images/logo2-removebg.png" alt="logo" class="logo" height="57"/>
+                    <img src="~/images/logo2-removebg.png" alt="logo" class="logo"/>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "AdminDashboard" ? "active" : "")"
@@ -68,7 +68,7 @@
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "HealthBlogs" ? "active" : "")"
                                asp-area="" asp-controller="Admin" asp-action="HealthBlogs">
-                                HealthBlogs
+                                Health Blogs
                             </a>
                         </li>
                         <li class="nav-item">

@@ -33,8 +33,8 @@ namespace RIAYA.Controllers
                             return RedirectToAction("AdminDashboard", "Admin");
                         case "provider":
                             return RedirectToAction("ProviderDashboard", "Provider");
-                        case "user":
-                            return RedirectToAction("Index", "Home");
+                        //case "user":
+                        //    return RedirectToAction("Index", "Home");
                         default:
                             break;
                     }

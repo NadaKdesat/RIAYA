@@ -29,7 +29,7 @@
             <div class="white"></div>
             <h3>Home Care Appointments</h3>
             <p>Book a scheduled home visit at your convenience. Ideal for follow-ups, therapy sessions, and general checkups.</p>
-            <button type="button" onclick="openBookAppointmentModal()">Book Appointment</button>
+            <button type="button" onclick="openHomeCareModal()">Book Appointment</button>
         </div>
     </section>
 </main>
@@ -188,43 +188,51 @@
 
 
 
-@*     <!-- Book Appointment Modal -->
-    <div class="modal fade" id="instantCareModal" tabindex="-1" aria-labelledby="instantCareModalLabel" aria-hidden="true">
+    <!-- Home Care Appointment Modal -->
+    <div class="modal fade" id="homeCareModal" tabindex="-1" aria-labelledby="homeCareModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="instantCareModalLabel">Instant Home Care Request</h5>
+                    <h5 class="modal-title" id="homeCareModalLabel">Home Care Appointments</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form id="instantCareForm" action="/Service/SubmitInstantCare" method="post">
+                    <form id="homeCareForm" action="/Service/SubmitHomeCare" method="post">
                         <input type="hidden" name="PatientId" value="@ViewData["PatientId"]" />
-                        <!-- Step 1: Personal and Contact Information -->
-                        <div id="step1">
+
+                        <!-- Step 1: Patient Information -->
+                        <div id="homeCareStep1">
                             <h4>Patient Information</h4>
+
                             <div class="mb-3">
-                                <label for="patientFullName" class="form-label">Patient Full Name *</label>
-                                <input type="text" class="form-control" id="patientFullName" name="PatientFullName" required>
+                                <label for="homeCarePatientName" class="form-label">Patient Full Name *</label>
+                                <input type="text" class="form-control" id="homeCarePatientName" name="PatientFullName" required>
                             </div>
+
                             <div class="mb-3">
-                                <label for="patientGender" class="form-label">Patient Gender *</label>
-                                <select class="form-select" id="patientGender" name="PatientGender" required>
+                                <label for="homeCarePatientGender" class="form-label">Patient Gender *</label>
+                                <select class="form-select" id="homeCarePatientGender" name="PatientGender" required>
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="patientBirthDate" class="form-label">Patient Birth Date *</label>
-                                <input type="date" class="form-control" id="patientBirthDate" name="PatientBirthDate" required>
+                                <label for="homeCarePatientBirthDate" class="form-label">Patient Birth Date *</label>
+                                <input type="date" class="form-control" id="homeCarePatientBirthDate" name="PatientBirthDate" required>
                             </div>
+
                             <div class="mb-3">
-                                <label for="contactPhone" class="form-label">Contact Phone *</label>
-                                <input type="tel" class="form-control" id="contactPhone" name="ContactPhone" pattern="^07[789]\d{7}$" required>
+                                <label for="homeCareContactPhone" class="form-label">Contact Phone *</label>
+                                <input type="tel" class="form-control" id="homeCareContactPhone" name="ContactPhone" pattern="^07[789]\d{7}$" required>
                             </div>
+
                             <div class="mb-3">
-                                <label for="categorySelect" class="form-label">Category *</label>
-                                <select class="form-select" id="categorySelect" name="CategorySelect" required>
+                                <label for="homeCareCategorySelect" class="form-label">Category *</label>
+                                <select class="form-select" id="homeCareCategorySelect" name="CategorySelect" required>
                                     <option value="">Select Category</option>
                                     @foreach (var category in Model)
                                     {
@@ -237,8 +245,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="serviceSelect" class="form-label">Service *</label>
-                                <select class="form-select" id="serviceSelect" name="ServiceSelect" required>
+                                <label for="homeCareServiceSelect" class="form-label">Service *</label>
+                                <select class="form-select" id="homeCareServiceSelect" name="ServiceSelect" required>
                                     <option value="">Select Service</option>
                                     @if (ViewData["SelectedCategory"] != null)
                                     {
@@ -253,105 +261,131 @@
                                     }
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="doctorSelect" class="form-label">Choose Doctor *</label>
-                                <select class="form-select" id="doctorSelect" name="DoctorId" required>
+                                <label for="homeCareProviderSelect" class="form-label">Choose Doctor *</label>
+                                <select class="form-select" id="homeCareProviderSelect" name="ProviderSelect" required>
                                     <option value="">Select Doctor</option>
-                                    @foreach (var doctor in ViewData["Doctors"] as List<RIAYA.Models.Provider>)
+                                    @if (ViewData["SelectedCategory"] != null)
                                     {
-                                        <option value="@doctor.Id">@doctor.</option>
+                                        var selectedCategory = ViewData["SelectedCategory"] as RIAYA.Models.ServiceCategory;
+                                        if (selectedCategory != null && selectedCategory.Services != null)
+                                        {
+                                            foreach (var provider in selectedCategory.Providers)
+                                            {
+                                                <option value="@provider.Id">@provider.User.Provider</option>
+                                            }
+                                        }
                                     }
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label for="appointmentDate" class="form-label">Select Date *</label>
-                                <input type="date" class="form-control" id="appointmentDate" name="AppointmentDate" required>
+                                <label for="homeCareDateSelect" class="form-label">Select Date *</label>
+                                <select class="form-select" id="homeCareDateSelect" name="AppointmentDate" required>
+                                    <option value="">Select Date</option>
+                                </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="appointmentTime" class="form-label">Select Time *</label>
-                                <select class="form-select" id="appointmentTime" name="AppointmentTime" required>
+                                <label for="homeCareTimeSelect" class="form-label">Select Time *</label>
+                                <select class="form-select" id="homeCareTimeSelect" name="AppointmentTime" required>
                                     <option value="">Select Time</option>
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="patientConditionDescription" class="form-label">Patient Condition Description *</label>
-                                <textarea class="form-control" id="patientConditionDescription" name="PatientConditionDescription" rows="3" required></textarea>
+                                <label for="homeCareConditionDescription" class="form-label">Patient Condition Description *</label>
+                                <textarea class="form-control" id="homeCareConditionDescription" name="PatientConditionDescription" rows="3" required></textarea>
                             </div>
+
                         </div>
 
-                        <!-- Step 2: Location Information -->
-                        <div id="step2" style="display: none;">
+                        <!-- Step 2: Location Details -->
+                        <div id="homeCareStep2" style="display: none;">
                             <h4>Location Details</h4>
+
                             <div class="mb-3">
                                 <label class="form-label">Pick Location on Map *</label>
-                                <div id="map" style="height: 300px;"></div>
-                                <input type="hidden" id="latitude" name="latitude" required />
-                                <input type="hidden" id="longitude" name="longitude" required />
+                                <div id="homeCareMap" style="height: 300px;"></div>
+                                <input type="hidden" id="homeCareLatitude" name="latitude" required />
+                                <input type="hidden" id="homeCareLongitude" name="longitude" required />
                             </div>
+
                             <div class="mb-3">
-                                <label for="locationType" class="form-label">Location Type *</label>
-                                <select class="form-select" id="locationType" name="LocationType" required>
+                                <label for="homeCareLocationType" class="form-label">Location Type *</label>
+                                <select class="form-select" id="homeCareLocationType" name="LocationType" required>
                                     <option value="">Select Location Type</option>
                                     <option value="Home">Home</option>
                                     <option value="Apartment">Apartment</option>
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="buildingName" class="form-label">Building Name</label>
-                                <input type="text" class="form-control" id="buildingName" name="BuildingName">
+                                <label for="homeCareBuildingName" class="form-label">Building Name</label>
+                                <input type="text" class="form-control" id="homeCareBuildingName" name="BuildingName">
                             </div>
+
                             <div class="mb-3">
-                                <label for="floorNumber" class="form-label">Floor Number</label>
-                                <input type="text" class="form-control" id="floorNumber" name="FloorNumber">
+                                <label for="homeCareFloorNumber" class="form-label">Floor Number</label>
+                                <input type="text" class="form-control" id="homeCareFloorNumber" name="FloorNumber">
                             </div>
+
                             <div class="mb-3">
-                                <label for="apartmentNumber" class="form-label">Apartment/Unit Number</label>
-                                <input type="text" class="form-control" id="apartmentNumber" name="ApartmentNumber">
+                                <label for="homeCareApartmentNumber" class="form-label">Apartment/Unit Number</label>
+                                <input type="text" class="form-control" id="homeCareApartmentNumber" name="ApartmentNumber">
                             </div>
+
                             <div class="mb-3">
-                                <label for="streetName" class="form-label">Street Name *</label>
-                                <input type="text" class="form-control" id="streetName" name="StreetName" required>
+                                <label for="homeCareStreetName" class="form-label">Street Name *</label>
+                                <input type="text" class="form-control" id="homeCareStreetName" name="StreetName" required>
                             </div>
                         </div>
 
-                        <!-- Step 3: Status Confirmation -->
-                        <div id="step3" style="display: none;">
-                            <div id="bookingDetails" class="mb-3">
+                        <!-- Step 3: Payment -->
+                        <div id="homeCareStep3" style="display: none;">
+                            <div id="homeCareBookingDetails" class="mb-3">
                                 <h5>Booking Details:</h5>
-                                <p><strong>Category:</strong> <span id="displayCategory"></span></p>
-                                <p><strong>Service:</strong> <span id="displayService"></span></p>
-                                <p><strong>Price:</strong> <span id="displayPrice"></span></p>
+                                <p><strong>Category:</strong> <span id="homeCareDisplayCategory"></span></p>
+                                <p><strong>Service:</strong> <span id="homeCareDisplayService"></span></p>
+                                <p><strong>Price:</strong> <span id="homeCareDisplayPrice"></span></p>
                             </div>
 
                             <h4>Payment Details</h4>
+
                             <div class="mb-3">
-                                <label for="cardNumber" class="form-label">Card Number *</label>
-                                <input type="text" class="form-control" id="cardNumber" name="CardNumber" required>
+                                <label for="homeCareCardNumber" class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" id="homeCareCardNumber" name="CardNumber" required>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="expiryDate" class="form-label">Expiry Date *</label>
-                                    <input type="text" class="form-control" id="expiryDate" name="ExpiryDate" placeholder="MM/YY" required>
+                                    <label for="homeCareExpiryDate" class="form-label">Expiry Date *</label>
+                                    <input type="text" class="form-control" id="homeCareExpiryDate" name="ExpiryDate" placeholder="MM/YY" required>
                                 </div>
+
                                 <div class="col-md-6 mb-3">
-                                    <label for="cvv" class="form-label">CVV *</label>
-                                    <input type="text" class="form-control" id="cvv" name="CVV" required>
+                                    <label for="homeCareCVV" class="form-label">CVV *</label>
+                                    <input type="text" class="form-control" id="homeCareCVV" name="CVV" required>
                                 </div>
                             </div>
-                            <div id="instantSuccessMessageContainer" class="alert alert-success mt-3 d-none"></div>
+
+                            <div id="homeCareSuccessMessage" class="alert alert-success mt-3 d-none"></div>
                         </div>
+
+                        <!-- Modal Footer -->
                         <div class="modal-footer">
-                            @* <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> *@
-                            @* <button type="button" class="btn btn-primary" id="prevBtn" style="display: none;">Previous</button>
-                            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
-                            <button type="submit" class="btn btn-success" id="finishBtn" style="display: none;">Confirm Appointment</button>
+                            <button type="button" class="btn btn-primary" id="homeCarePrevBtn" style="display: none;">Previous</button>
+                            <button type="button" class="btn btn-primary" id="homeCareNextBtn">Next</button>
+                            <button type="submit" class="btn btn-success" id="homeCareFinishBtn" style="display: none;">Confirm Appointment</button>
                         </div>
+
                     </form>
                 </div>
+
             </div>
         </div>
-    </div> *@ 
+    </div>
 }
 else
 {
@@ -379,18 +413,15 @@ else
             loadServices(); // تحميل الخدمات بناءً على الفئة المختارة
         });
 
-                               $(document).on('change', '#serviceSelect', function() {
+        $(document).on('change', '#serviceSelect', function() {
             var selectedOption = this.selectedOptions[0];
             selectedServiceName = selectedOption.text;
-        selectedServicePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
+            selectedServicePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
 
             document.getElementById('displayService').innerText = selectedServiceName;
-        document.getElementById('displayPrice').innerText =
+            document.getElementById('displayPrice').innerText =
             (selectedServicePrice && !isNaN(selectedServicePrice)) ? (selectedServicePrice.toFixed(2) + " JOD") : "0.00 JOD";
-                });
-
-
-
+        });
 
         let currentStep = 1;
         const totalSteps = 3;
@@ -531,6 +562,246 @@ else
                                 modal.hide();
                             }, 1500);
                         } 
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+        window.openHomeCareModal = function () {
+            const modal = new bootstrap.Modal(document.getElementById('homeCareModal'));
+            modal.show();
+        }
+
+        let homeCareSelectedCategoryName = '';
+        let homeCareSelectedServiceName = '';
+        let homeCareSelectedServicePrice = '';
+
+        document.getElementById('homeCareCategorySelect').addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            homeCareSelectedCategoryName = selectedOption.text;
+            loadHomeCareServices();
+            loadHomeCareProviders();
+            loadHomeCareProviderAvailability();
+        });
+
+        $(document).on('change', '#homeCareServiceSelect', function() {
+            var selectedOption = this.selectedOptions[0];
+            homeCareSelectedServiceName = selectedOption.text;
+            homeCareSelectedServicePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
+
+            document.getElementById('homeCareDisplayService').innerText = homeCareSelectedServiceName;
+            document.getElementById('homeCareDisplayPrice').innerText =
+            (homeCareSelectedServicePrice && !isNaN(homeCareSelectedServicePrice)) ? (homeCareSelectedServicePrice.toFixed(2) + " JOD") : "0.00 JOD";
+        });
+
+        let homeCareCurrentStep = 1;
+        const homeCareTotalSteps = 3;
+        let homeCareMapInitialized = false;
+        let homeCareMap, homeCareMarker;
+
+        function validateHomeCareStep(step) {
+            const form = document.getElementById('homeCareForm');
+            let inputs = form.querySelectorAll(`#homeCareStep${homeCareCurrentStep} input[required], #homeCareStep${homeCareCurrentStep} select[required], #homeCareStep${homeCareCurrentStep} textarea[required]`);
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            return isValid;
+        }
+
+        function showHomeCareStep(step) {
+            document.querySelectorAll('[id^="homeCareStep"]').forEach(el => el.style.display = 'none');
+            document.getElementById(`homeCareStep${step}`).style.display = 'block';
+
+            document.getElementById('homeCarePrevBtn').style.display = step > 1 ? 'inline-block' : 'none';
+            document.getElementById('homeCareNextBtn').style.display = step < homeCareTotalSteps ? 'inline-block' : 'none';
+            document.getElementById('homeCareFinishBtn').style.display = step === homeCareTotalSteps ? 'inline-block' : 'none';
+
+            if (step === 2 && !homeCareMapInitialized) {
+                setTimeout(initHomeCareMap, 500);
+            }
+
+            if (homeCareCurrentStep === 3) {
+                document.getElementById('homeCareDisplayCategory').innerText = homeCareSelectedCategoryName || '-';
+                document.getElementById('homeCareDisplayService').innerText = homeCareSelectedServiceName || '-';
+                document.getElementById('homeCareDisplayPrice').innerText =
+                    (homeCareSelectedServicePrice && !isNaN(homeCareSelectedServicePrice)) ? (homeCareSelectedServicePrice + " JOD") : "0.00 JOD";
+            }
+        }
+
+        function initHomeCareMap() {
+            if (homeCareMapInitialized) return;
+            homeCareMapInitialized = true;
+            homeCareMap = new google.maps.Map(document.getElementById('homeCareMap'), {
+                center: { lat: 31.963158, lng: 35.930359 },
+                zoom: 13
+            });
+
+            google.maps.event.addListener(homeCareMap, 'click', function (e) {
+                const lat = e.latLng.lat().toFixed(6);
+                const lng = e.latLng.lng().toFixed(6);
+
+                document.getElementById('homeCareLatitude').value = lat;
+                document.getElementById('homeCareLongitude').value = lng;
+
+                if (homeCareMarker) {
+                    homeCareMarker.setPosition(e.latLng);
+                } else {
+                    homeCareMarker = new google.maps.Marker({
+                        position: e.latLng,
+                        map: homeCareMap
+                    });
+                }
+            });
+        }
+
+        document.getElementById('homeCareNextBtn').addEventListener('click', () => {
+            if (validateHomeCareStep(homeCareCurrentStep)) {
+                homeCareCurrentStep++;
+                showHomeCareStep(homeCareCurrentStep);
+            }
+        });
+
+        document.getElementById('homeCarePrevBtn').addEventListener('click', () => {
+            homeCareCurrentStep--;
+            showHomeCareStep(homeCareCurrentStep);
+        });
+
+        var homeCareSelectedCategoryId = @(ViewData["SelectedCategory"] != null ? (ViewData["SelectedCategory"] as RIAYA.Models.ServiceCategory)?.Id.ToString() : "null");
+
+        if (homeCareSelectedCategoryId !== "null") {
+            var selectElement = document.getElementById("homeCareCategorySelect");
+            var options = selectElement.getElementsByTagName("option");
+
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].value == homeCareSelectedCategoryId) {
+                    options[i].selected = true;
+                    break;
+                }
+            }
+        }
+
+        function loadHomeCareServices() {
+            var categoryId = document.getElementById("homeCareCategorySelect").value;
+
+            if (categoryId) {
+                $.get('@Url.Action("GetServicesByCategory", "Service")', { categoryId: categoryId }, function(data) {
+                    var serviceSelect = $('#homeCareServiceSelect');
+                    serviceSelect.empty();
+                    serviceSelect.append('<option value="">Select Service</option>');
+
+                    $.each(data, function(index, service) {
+                        serviceSelect.append('<option value="' + service.id + '" data-price="' + service.price + '">' + service.serviceDescription + '</option>');
+                    });
+
+                });
+            } else {
+                $('#homeCareServiceSelect').empty();
+                $('#homeCareServiceSelect').append('<option value="">Select Service</option>');
+            }
+        }
+
+        function loadHomeCareProviders() {
+            var categoryId = document.getElementById("homeCareCategorySelect").value;
+
+            if (categoryId) {
+                $.get('@Url.Action("GetProvidersByCategory", "Service")', { categoryId: categoryId }, function (data) {
+                    var providersSelect = $('#homeCareProviderSelect');
+                    providersSelect.empty();
+                    providersSelect.append('<option value="">Select Provider</option>');
+
+                    $.each(data, function (index, provider) {
+                        providersSelect.append('<option value="' + provider.id + '">' + provider.fullName + '</option>');
+                    });
+                });
+            } else {
+                $('#homeCareProviderSelect').empty();
+                $('#homeCareProviderSelect').append('<option value="">Select Provider</option>');
+            }
+        }
+
+                $(document).on('change', '#homeCareProviderSelect', function () {
+            loadHomeCareProviderAvailability();
+        });
+
+        function loadHomeCareProviderAvailability() {
+            var providerId = document.getElementById("homeCareProviderSelect").value;
+
+            if (providerId) {
+                        $.get('@Url.Action("GetAvailableDatesAndTimes", "Service")', { providerId: providerId }, function (data) {
+            console.log(data); // تحقق من البيانات في الـ Console
+            var dateSelect = $('#homeCareDateSelect');
+            var timeSelect = $('#homeCareTimeSelect');
+
+            dateSelect.empty();
+            timeSelect.empty();
+
+            dateSelect.append('<option value="">Select Date</option>');
+
+            // إذا كانت البيانات تحتوي على تواريخ
+            if (Array.isArray(data) && data.length > 0) {
+                        $.each(data, function (index, item) {
+            dateSelect.append('<option value="' + item.date + '">' + item.date + '</option>');
+        });
+
+        dateSelect.off('change').on('change', function () {
+            var selectedDate = $(this).val();
+            timeSelect.empty().append('<option value="">Select Time</option>');
+
+            var selectedItem = data.find(d => d.date === selectedDate);
+            if (selectedItem && selectedItem.times) {
+                $.each(selectedItem.times, function (index, time) {
+                    timeSelect.append('<option value="' + time + '">' + time + '</option>');
+                });
+            }
+        });
+            } else {
+                dateSelect.append('<option value="">No Available Dates</option>');
+            }
+        });
+
+            } else {
+                $('#homeCareDateSelect').empty().append('<option value="">Select Date</option>');
+                $('#homeCareTimeSelect').empty().append('<option value="">Select Time</option>');
+            }
+        }
+        
+
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $("#homeCareForm").on("submit", function(event) {
+                event.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '/Service/SubmitHomeCare', // تأكدي من أن الراوت صحيح
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            $('#homeCareSuccessMessage').text(response.message).removeClass('d-none').addClass('alert alert-success mt-3');
+
+                            setTimeout(function() {
+                                var modal = bootstrap.Modal.getInstance(document.getElementById('homeCareModal'));
+                                modal.hide();
+                            }, 1500);
+                        }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);

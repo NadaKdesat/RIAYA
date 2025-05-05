@@ -31,6 +31,8 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<Provider> Providers { get; set; }
 
+    public virtual DbSet<ProviderAvailability> ProviderAvailabilities { get; set; }
+
     public virtual DbSet<Service> Services { get; set; }
 
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
@@ -74,9 +76,8 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<ElectronicConsultation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC07A6803302");
+            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC07F63E545F");
 
-            entity.Property(e => e.AppointmentTime).HasColumnType("datetime");
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.ConsultationLink).HasMaxLength(500);
             entity.Property(e => e.CreatedAt)
@@ -89,15 +90,15 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Electroni__Patie__4E88ABD4");
+                .HasConstraintName("FK__Electroni__Patie__06CD04F7");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__Electroni__Provi__4F7CD00D");
+                .HasConstraintName("FK__Electroni__Provi__07C12930");
 
             entity.HasOne(d => d.Service).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__Electroni__Servi__5070F446");
+                .HasConstraintName("FK__Electroni__Servi__08B54D69");
         });
 
         modelBuilder.Entity<HealthBlog>(entity =>
@@ -118,10 +119,9 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<HomeCareAppointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC0772FC173C");
+            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC07BA40F778");
 
             entity.Property(e => e.ApartmentNumber).HasMaxLength(50);
-            entity.Property(e => e.AppointmentTime).HasColumnType("datetime");
             entity.Property(e => e.BuildingName).HasMaxLength(100);
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.ContactPhone).HasMaxLength(20);
@@ -140,15 +140,15 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__HomeCareA__Patie__5535A963");
+                .HasConstraintName("FK__HomeCareA__Patie__0D7A0286");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__HomeCareA__Provi__5629CD9C");
+                .HasConstraintName("FK__HomeCareA__Provi__0E6E26BF");
 
             entity.HasOne(d => d.Service).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__HomeCareA__Servi__571DF1D5");
+                .HasConstraintName("FK__HomeCareA__Servi__0F624AF8");
         });
 
         modelBuilder.Entity<InstantHomeCareAppointment>(entity =>
@@ -221,6 +221,16 @@ public partial class MyDbContext : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.Provider)
                 .HasForeignKey<Provider>(d => d.UserId)
                 .HasConstraintName("FK__Providers__UserI__412EB0B6");
+        });
+
+        modelBuilder.Entity<ProviderAvailability>(entity =>
+        {
+            entity.HasKey(e => e.ProviderAvailabilityId).HasName("PK__Provider__B8DFFA745359E448");
+
+            entity.ToTable("ProviderAvailability");
+
+            entity.Property(e => e.ProviderAvailabilityId).HasColumnName("ProviderAvailabilityID");
+            entity.Property(e => e.ProviderId).HasColumnName("ProviderID");
         });
 
         modelBuilder.Entity<Service>(entity =>
