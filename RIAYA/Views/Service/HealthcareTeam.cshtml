@@ -1,8 +1,10 @@
-﻿@{
+﻿@model List<HealthcareProviderViewModel>
+@{
     ViewData["Title"] = "Healthcare Team";
 }
 @section Style {
     <link rel="stylesheet" href="~/css/healthcareTeam.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css" rel="stylesheet">
 }
 
 <section class="Healthcare">
@@ -14,144 +16,212 @@
         <div class="filter-section">
             <h3 class="filter-title">Specialty</h3>
             <ul class="filter-list">
-                <li><a href="#">Eros augue</a></li>
-                <li><a href="#">Vitae fermentum</a></li>
-                <li><a href="#">Neque urna pellentesque</a></li>
-                <li><a href="#">Consectetur quis</a></li>
-                <li><a href="#">Porta condimentum</a></li>
+                <li>
+                    <a asp-action="HealthcareTeam" asp-controller="Service" asp-route-specialty="All Specialty">All Specialty</a>
+                </li>
+
+                @{
+                    var allCategories = ViewData["AllCategories"] as List<string>;
+                    var selectedCategoryName = ViewData["SelectedCategoryName"] as string;
+                }
+                @foreach (var category in allCategories)
+                {
+                    var isActive = category == selectedCategoryName ? "active-filter" : "";
+                    <li>
+                        <a asp-action="HealthcareTeam" asp-controller="Service" asp-route-specialty="@category" class="@isActive">
+                            @category
+                        </a>
+                    </li>
+                }
+
             </ul>
         </div>
         <div class="filter-section">
             <h3 class="filter-title">Gender</h3>
-            <div class="checkbox-labels">
-            <label class="checkbox-label"><input type="radio" name="gender" checked /> No Preference</label>
-            <label class="checkbox-label"><input type="radio" name="gender" /> Male</label>
-            <label class="checkbox-label"><input type="radio" name="gender" /> Female</label>
-            </div>
+            <form method="get" asp-action="HealthcareTeam" asp-controller="Service">
+                <div class="checkbox-labels">
+                    @{
+                        var selectedGender = ViewData["SelectedGender"] as string;
+                    }
+                    <label class="checkbox-label">
+                        <input type="radio" name="gender" value="No Preference" @(string.IsNullOrEmpty(selectedGender) || selectedGender == "No Preference" ? "checked" : "") onchange="this.form.submit();" /> No Preference
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="radio" name="gender" value="Male" @(selectedGender == "Male" ? "checked" : "") onchange="this.form.submit();" /> Male
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="radio" name="gender" value="Female" @(selectedGender == "Female" ? "checked" : "") onchange="this.form.submit();" /> Female
+                    </label>
+
+                    <!-- نعيد إرسال القيم المختارة للتخصص و الخبرة لو في -->
+                    <input type="hidden" name="specialty" value="@ViewData["SelectedCategoryName"]" />
+                    <input type="hidden" name="minExperience" value="" />
+                    <input type="hidden" name="maxExperience" value="" />
+                </div>
+            </form>
         </div>
         <div class="filter-section">
             <h3 class="filter-title">Years of Experience</h3>
             <div class="range-slider">
-                <input type="range" min="0" max="20" value="10" />
-                <br />
-                <span>0 Years - 20 Year</span>
+                <form method="get" asp-action="HealthcareTeam" asp-controller="Service">
+                    @{
+                        var selectedMin = (ViewData["SelectedMinExperience"] as int?) ?? 0;
+                        var selectedMax = (ViewData["SelectedMaxExperience"] as int?) ?? 20;
+                    }
+
+                    <div class="range-slider-wrapper mb-3">
+                        <label>Min Years: <span id="minExperienceValue">@selectedMin</span></label>
+                        <input type="range" id="minExperience" name="minExperience" min="0" max="20" value="@selectedMin" />
+
+                        <label>Max Years: <span id="maxExperienceValue">@selectedMax</span></label>
+                        <input type="range" id="maxExperience" name="maxExperience" min="0" max="20" value="@selectedMax" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm mt-2">Apply Filter</button>
+
+                    <input type="hidden" name="specialty" value="@ViewData["SelectedCategoryName"]" />
+                    <input type="hidden" name="gender" value="@ViewData["SelectedGender"]" />
+                </form>
             </div>
+
         </div>
     </aside>
     <main class="doctors-list-main">
         <div class="doctors-list-toolbar">
-            <span>Showing 1-6 of 60 Results</span>
+            @{
+                int totalResults = Model.Count();
+            }
+                <span>Showing @totalResults Results</span>
+
             <div class="toolbar-actions">
-                @* <button class="view-toggle active"><svg width="18" height="18"><rect width="6" height="6" /><rect x="12" width="6" height="6" /><rect y="12" width="6" height="6" /><rect x="12" y="12" width="6" height="6" /></svg></button>
-                <button class="view-toggle"><svg width="18" height="18"><rect width="18" height="6" /><rect y="12" width="18" height="6" /></svg></button> *@
-                <select class="sort-select">
-                    <option>Sort By</option>
+                <select class="sort-select" onchange="window.location.href = this.value;">
+                    <option value="?sortBy=">Sort By</option>
+                    <option value="?sortBy=experience&specialty=@ViewData["SelectedCategoryName"]&gender=@ViewData["SelectedGender"]&minExperience=@ViewData["SelectedMinExperience"]&maxExperience=@ViewData["SelectedMaxExperience"]">
+                        Sort by Experience
+                    </option>
+                    <option value="?sortBy=rating&specialty=@ViewData["SelectedCategoryName"]&gender=@ViewData["SelectedGender"]&minExperience=@ViewData["SelectedMinExperience"]&maxExperience=@ViewData["SelectedMaxExperience"]">
+                        Sort by Rating
+                    </option>
                 </select>
             </div>
         </div>
-        <div class="doctors-cards">
-            <!-- Doctor Card 1 -->
-            <div class="doctor-card">
-                <div class="doctor-img"><img src="/img/doctor2.png" alt="Doctor" /></div>
-                <div class="doctor-info">
-                    <h4 class="doctor-name">Matthew Fox</h4>
-                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
-                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
-                    <div class="doctor-meta ps-3">
-                        <span class="doctor-exp"> <i class="fa-solid fa-award"></i> 6 - 10 Yrs Experience</span>
-                        <span class="doctor-days"><i class="fa-solid fa-calendar-week"></i> Tue, Wed, Thu, Fri</span>
-                        <div class="doctor-rating mt-5">
-                            <span class="stars">★★★★★</span>
-                            <span class="reviews">(38)</span>
-                        </div>
-                    </div>
-                    @* <div class="doctor-actions">
-                        <button class="view-more">View More</button>
-                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
-                    </div> *@
-                </div>
-            </div>
-            <!-- Doctor Card 2 -->
-            <div class="doctor-card">
-                <div class="doctor-img"><img src="/img/doctor3.png" alt="Doctor" /></div>
-                <div class="doctor-info">
-                    <h4 class="doctor-name">Jessica Lawson</h4>
-                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
-                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
-                    <div class="doctor-meta">
-                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
-                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
-                        <div class="doctor-rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="reviews">(38)</span>
-                        </div>
-                    </div>
-                   @*  <div class="doctor-actions">
-                        <button class="view-more">View More</button>
-                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
-                    </div> *@
-                </div>
-            </div>
-            <!-- Doctor Card 4 -->
-            <div class="doctor-card">
-                <div class="doctor-img"><img src="/img/doctor4.png" alt="Doctor" /></div>
-                <div class="doctor-info">
-                    <h4 class="doctor-name">Joan Porter</h4>
-                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
-                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
-                    <div class="doctor-meta">
-                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
-                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
-                        <div class="doctor-rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="reviews">(38)</span>
-                        </div>
-                    </div>
-                    @* <div class="doctor-actions">
-                        <button class="view-more">View More</button>
-                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
-                    </div> *@
-                </div>
-            </div>
-            <!-- Doctor Card 5 -->
-            <div class="doctor-card">
-                <div class="doctor-img"><img src="/img/doctor5.png" alt="Doctor" /></div>
-                <div class="doctor-info">
-                    <h4 class="doctor-name">Diana Chavez</h4>
-                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
-                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
-                    <div class="doctor-meta">
-                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
-                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
-                        <div class="doctor-rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="reviews">(38)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Doctor Card 6 -->
-            <div class="doctor-card">
-                <div class="doctor-img"><img src="/img/doctor1.png" alt="Doctor" /></div>
-                <div class="doctor-info">
-                    <h4 class="doctor-name">Kelly Ross</h4>
-                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
-                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
-                    <div class="doctor-meta">
-                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
-                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
-                        <div class="doctor-rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="reviews">(38)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="doctors-cards mb-5">
+              @if (!Model.Any())
+    {
+                <div class="no-results-message" style="color: #4b637e; font-weight: bold; padding: 1rem;">
+            No healthcare providers match the selected filters.
         </div>
-        <div class="pagination mb-5">
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+    }
+    else
+    {
+            @foreach (var item in Model)
+            {
+                <div class="doctor-card">
+                    <div class="doctor-img">
+                        <img src="~/images/@item.ProfileImage" alt="Doctor" class="doctor-img-top" />
+                    </div>
+                    <div class="doctor-info">
+                        <h4 class="doctor-name">@item.FullName</h4>
+                        <div class="doctor-specialty">@item.Specialization</div>
+                        <div class="doctor-bio">@item.Bio</div>
+                        <div class="doctor-meta ps-3">
+                            <span class="doctor-exp">
+                                <i class="fa-solid fa-award"></i> @item.YearsOfExperience - Yrs Experience
+                            </span>
+                            <span class="doctor-days">
+                                <i class="fa-solid fa-calendar-week"></i>
+                                @string.Join(", ", item.Availability.Select(av => GetDayAbbreviation(av.DayOfWeek)))
+                            </span>
+                            <div class="doctor-rating mt-5">
+                                <span class="stars">★★★★★</span>
+                                <span class="reviews">(38)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @functions {
+                private string GetDayAbbreviation(int dayOfWeek)
+                {
+                    switch (dayOfWeek)
+                    {
+                        case 0: return "Sun"; // Sunday
+                        case 1: return "Mon"; // Monday
+                        case 2: return "Tue"; // Tuesday
+                        case 3: return "Wed"; // Wednesday
+                        case 4: return "Thu"; // Thursday
+                        case 5: return "Fri"; // Friday
+                        case 6: return "Sat"; // Saturday
+                        default: return "";
+                    }
+                }
+            }
+            }
+            }
         </div>
     </main>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+        <script>
+        // تغيير لون الخط قبل النقطة
+        function updateSliderColors() {
+            const minSlider = document.getElementById("minExperience");
+            const maxSlider = document.getElementById("maxExperience");
+            
+            const minValue = minSlider.value;
+            const maxValue = maxSlider.value;
+
+            // تحديث قيمة Min
+            document.getElementById("minExperienceValue").textContent = minValue;
+
+            // تحديث قيمة Max
+            document.getElementById("maxExperienceValue").textContent = maxValue;
+
+            // تغيير لون الشريط للكحلي
+            const minPercentage = (minValue - minSlider.min) / (minSlider.max - minSlider.min) * 100;
+            const maxPercentage = (maxValue - maxSlider.min) / (maxSlider.max - maxSlider.min) * 100;
+
+            minSlider.style.background = `linear-gradient(to right, #003366 ${minPercentage}%, #ddd ${minPercentage}%)`;
+            maxSlider.style.background = `linear-gradient(to right, #003366 ${maxPercentage}%, #ddd ${maxPercentage}%)`;
+        }
+
+        // إضافة حدث عند التحريك
+        document.getElementById("minExperience").addEventListener("input", updateSliderColors);
+        document.getElementById("maxExperience").addEventListener("input", updateSliderColors);
+
+        // استدعاء الوظيفة عند تحميل الصفحة لتحديث الألوان الأولية
+        updateSliderColors();
+
+            function sortDoctors(selectElement) {
+            var sortBy = selectElement.value;
+            var doctorsList = document.querySelectorAll('.doctor-card'); // جميع بطاقات الأطباء
+
+            var sortedList = Array.from(doctorsList);
+
+            if (sortBy === "experience") {
+                // ترتيب حسب الخبرة
+                sortedList.sort((a, b) => {
+                    var expA = parseInt(a.querySelector('.doctor-exp').textContent) || 0;
+                    var expB = parseInt(b.querySelector('.doctor-exp').textContent) || 0;
+                    return expB - expA; // ترتيب تنازلي حسب الخبرة
+                });
+            } else if (sortBy === "rating") {
+                // ترتيب حسب التقييم
+                sortedList.sort((a, b) => {
+                    var ratingA = a.querySelector('.doctor-rating .stars').textContent.length; // طول النجوم يعكس التقييم
+                    var ratingB = b.querySelector('.doctor-rating .stars').textContent.length;
+                    return ratingB - ratingA; // ترتيب تنازلي حسب التقييم
+                });
+            }
+
+            // إضافة البطاقات المرتبة إلى الـ DOM
+            var doctorsContainer = document.querySelector('.doctors-cards');
+            doctorsContainer.innerHTML = '';
+            sortedList.forEach(doctor => {
+                doctorsContainer.appendChild(doctor);
+            });
+        }
+
+    </script>
+}

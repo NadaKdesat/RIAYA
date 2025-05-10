@@ -313,10 +313,11 @@ body {
     margin-bottom: 3px;
 }
 
-.doctor-university {
+.doctor-bio {
     color: #4b637e;
     font-size: 0.9rem;
     margin-bottom: 18px;
+    margin-right:255px;
 }
 
 .doctor-meta {
@@ -472,7 +473,7 @@ body {
     margin-bottom: 3px;
 }
 
-.doctor-university {
+.doctor-bio {
     color: #4b637e;
     font-size: 0.9rem;
     margin-bottom: 18px;
@@ -499,6 +500,7 @@ body {
     gap: 7px;
     color: #053D76;
     font-weight: 600;
+    width:170px;
 }
 
 .doctor-actions {
@@ -689,9 +691,14 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 32px;
+    margin-right: 15px;
 }
-
+.doctor-img-top {
+    width: 100%; /* خلي الصورة تملى العرض */
+    height: 250px; /* انت بتحدد الطول اللي بدك اياه */
+    object-fit: cover; /* يقص الزائد بدون تشويه */
+    object-position: top; /* خليه يركز عالجزء العلوي */
+}
 .doctor-info {
     flex: 1;
     display: flex;
@@ -715,7 +722,7 @@ body {
     margin-bottom: 3px;
 }
 
-.doctor-university {
+.doctor-bio {
     color: #4b637e;
     font-size: 0.9rem;
     margin-bottom: 18px;
@@ -863,4 +870,78 @@ body {
         min-width: unset;
         margin-top: 10px;
     }
+}
+
+.active-filter {
+    font-weight: bold;
+}
+
+.range-slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    .range-slider-wrapper input[type=range] {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        border-radius: 5px;
+        background: #e6eaf1; /* نفس لون حدود البطاقات */
+        outline: none;
+        transition: background 0.2s;
+    }
+
+        .range-slider-wrapper input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #053D76; /* الأخضر المستخدم في view-more */
+            cursor: pointer;
+            border: 2px solid #053D76; /* الأزرق الأساسي */
+            transition: background 0.2s, border 0.2s;
+        }
+
+        .range-slider-wrapper input[type=range]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00BFA6;
+            cursor: pointer;
+            border: 2px solid #053D76;
+        }
+
+        .range-slider-wrapper input[type=range]:hover {
+            background: #dce7f5; /* لون أخف عند الهوفر */
+        }
+
+.experience-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #053D76; /* الأزرق الأساسي */
+    font-weight: 600;
+}
+
+.filter-section button {
+    width: 100%;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #053D76;
+    border-color: #053D76;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #053D76;
+    border-color: #053D76;
+}
+
+.range-slider-wrapper label {
+    color: #4b637e;
 }

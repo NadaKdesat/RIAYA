@@ -281,11 +281,80 @@ namespace RIAYA.Controllers
             return Json(new { success = true, message = "Your consultation appointment has been successfully created!" });
         }
 
-
-        public IActionResult HealthcareTeam()
+        public IActionResult HealthcareTeam(string? specialty, string? gender, int? minExperience, int? maxExperience, string? sortBy)
         {
-            return View();
+            // جلب جميع التخصصات (بدون فلترة)
+            var allCategories = _context.ServiceCategories
+                .Select(c => c.CategoryName)
+                .Distinct()
+                .ToList();
+
+            // جلب جميع مقدمي الرعاية مع العلاقات المرتبطة
+            var query = _context.Providers
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            // تطبيق الفلاتر إذا تم اختيارها
+            if (!string.IsNullOrEmpty(specialty) && specialty != "All Specialty")
+            {
+                query = query.Where(p => p.Category.CategoryName == specialty);
+            }
+
+            if (!string.IsNullOrEmpty(gender) && gender != "No Preference")
+            {
+                query = query.Where(p => p.User.Gender == gender);
+            }
+
+            if (minExperience.HasValue)
+            {
+                query = query.Where(p => p.YearsOfExperience >= minExperience.Value);
+            }
+
+            if (maxExperience.HasValue)
+            {
+                query = query.Where(p => p.YearsOfExperience <= maxExperience.Value);
+            }
+
+            // تطبيق الترتيب حسب الخبرة أو التقييم إذا تم تحديده
+            if (sortBy == "experience")
+            {
+                query = query.OrderByDescending(p => p.YearsOfExperience); // ترتيب تنازلي حسب الخبرة
+            }
+            //else if (sortBy == "rating")
+            //{
+            //    query = query.OrderByDescending(p => p.User.Rating); // ترتيب تنازلي حسب التقييم
+            //}
+
+            var providersWithCategories = query
+                .Select(p => new HealthcareProviderViewModel
+                {
+                    FullName = p.User.FullName,
+                    ProfileImage = p.ProfileImage,
+                    Specialization = p.Specialization,
+                    Bio = p.Bio,
+                    YearsOfExperience = p.YearsOfExperience,
+                    Location = p.Location,
+                    LicenseUrl = p.LicenseUrl,
+                    CategoryName = p.Category.CategoryName,
+                    Availability = _context.ProviderAvailabilities
+                        .Where(pa => pa.ProviderId == p.Id)
+                        .ToList()
+                })
+                .ToList();
+
+            // تخزين القيم في ViewData لإعادة استخدامها في الـ View
+            ViewData["SelectedMinExperience"] = minExperience;
+            ViewData["SelectedMaxExperience"] = maxExperience;
+            ViewData["SelectedGender"] = gender;
+            ViewData["AllCategories"] = allCategories;
+            ViewData["SelectedCategoryName"] = specialty;
+            ViewData["SelectedSortBy"] = sortBy; // حفظ القيمة المحددة للترتيب
+
+            return View(providersWithCategories);
         }
+
+
 
     }
 }
