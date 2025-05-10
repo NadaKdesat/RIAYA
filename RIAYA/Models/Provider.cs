@@ -23,6 +23,8 @@ public partial class Provider
 
     public DateTime? CreatedAt { get; set; }
 
+    public string? ProfileImage { get; set; }
+
     public virtual ServiceCategory? Category { get; set; }
 
     public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();

@@ -282,7 +282,10 @@ namespace RIAYA.Controllers
         }
 
 
-
+        public IActionResult HealthcareTeam()
+        {
+            return View();
+        }
 
     }
 }

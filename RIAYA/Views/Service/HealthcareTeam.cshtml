@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Healthcare Team";
+}
+@section Style {
+    <link rel="stylesheet" href="~/css/healthcareTeam.css" asp-append-version="true" />
+}
+
+<section class="Healthcare">
+    <h1>Our Healthcare Team</h1>
+</section>
+
+<div class="container doctors-list-content">
+    <aside class="filters">
+        <div class="filter-section">
+            <h3 class="filter-title">Specialty</h3>
+            <ul class="filter-list">
+                <li><a href="#">Eros augue</a></li>
+                <li><a href="#">Vitae fermentum</a></li>
+                <li><a href="#">Neque urna pellentesque</a></li>
+                <li><a href="#">Consectetur quis</a></li>
+                <li><a href="#">Porta condimentum</a></li>
+            </ul>
+        </div>
+        <div class="filter-section">
+            <h3 class="filter-title">Gender</h3>
+            <div class="checkbox-labels">
+            <label class="checkbox-label"><input type="radio" name="gender" checked /> No Preference</label>
+            <label class="checkbox-label"><input type="radio" name="gender" /> Male</label>
+            <label class="checkbox-label"><input type="radio" name="gender" /> Female</label>
+            </div>
+        </div>
+        <div class="filter-section">
+            <h3 class="filter-title">Years of Experience</h3>
+            <div class="range-slider">
+                <input type="range" min="0" max="20" value="10" />
+                <br />
+                <span>0 Years - 20 Year</span>
+            </div>
+        </div>
+    </aside>
+    <main class="doctors-list-main">
+        <div class="doctors-list-toolbar">
+            <span>Showing 1-6 of 60 Results</span>
+            <div class="toolbar-actions">
+                @* <button class="view-toggle active"><svg width="18" height="18"><rect width="6" height="6" /><rect x="12" width="6" height="6" /><rect y="12" width="6" height="6" /><rect x="12" y="12" width="6" height="6" /></svg></button>
+                <button class="view-toggle"><svg width="18" height="18"><rect width="18" height="6" /><rect y="12" width="18" height="6" /></svg></button> *@
+                <select class="sort-select">
+                    <option>Sort By</option>
+                </select>
+            </div>
+        </div>
+        <div class="doctors-cards">
+            <!-- Doctor Card 1 -->
+            <div class="doctor-card">
+                <div class="doctor-img"><img src="/img/doctor2.png" alt="Doctor" /></div>
+                <div class="doctor-info">
+                    <h4 class="doctor-name">Matthew Fox</h4>
+                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
+                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
+                    <div class="doctor-meta ps-3">
+                        <span class="doctor-exp"> <i class="fa-solid fa-award"></i> 6 - 10 Yrs Experience</span>
+                        <span class="doctor-days"><i class="fa-solid fa-calendar-week"></i> Tue, Wed, Thu, Fri</span>
+                        <div class="doctor-rating mt-5">
+                            <span class="stars">★★★★★</span>
+                            <span class="reviews">(38)</span>
+                        </div>
+                    </div>
+                    @* <div class="doctor-actions">
+                        <button class="view-more">View More</button>
+                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
+                    </div> *@
+                </div>
+            </div>
+            <!-- Doctor Card 2 -->
+            <div class="doctor-card">
+                <div class="doctor-img"><img src="/img/doctor3.png" alt="Doctor" /></div>
+                <div class="doctor-info">
+                    <h4 class="doctor-name">Jessica Lawson</h4>
+                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
+                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
+                    <div class="doctor-meta">
+                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
+                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
+                        <div class="doctor-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="reviews">(38)</span>
+                        </div>
+                    </div>
+                   @*  <div class="doctor-actions">
+                        <button class="view-more">View More</button>
+                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
+                    </div> *@
+                </div>
+            </div>
+            <!-- Doctor Card 4 -->
+            <div class="doctor-card">
+                <div class="doctor-img"><img src="/img/doctor4.png" alt="Doctor" /></div>
+                <div class="doctor-info">
+                    <h4 class="doctor-name">Joan Porter</h4>
+                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
+                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
+                    <div class="doctor-meta">
+                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
+                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
+                        <div class="doctor-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="reviews">(38)</span>
+                        </div>
+                    </div>
+                    @* <div class="doctor-actions">
+                        <button class="view-more">View More</button>
+                        <button class="fav-btn"><svg width="20" height="20"><path d="M10 18l-1.45-1.32C4.4 12.36 2 10.28 2 7.5 2 5.5 3.5 4 5.5 4c1.54 0 3.04 1 3.57 2.36h1.87C11.46 5 12.96 4 14.5 4 16.5 4 18 5.5 18 7.5c0 2.78-2.4 4.86-6.55 9.18L10 18z" fill="#00BFA6" /></svg></button>
+                    </div> *@
+                </div>
+            </div>
+            <!-- Doctor Card 5 -->
+            <div class="doctor-card">
+                <div class="doctor-img"><img src="/img/doctor5.png" alt="Doctor" /></div>
+                <div class="doctor-info">
+                    <h4 class="doctor-name">Diana Chavez</h4>
+                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
+                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
+                    <div class="doctor-meta">
+                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
+                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
+                        <div class="doctor-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="reviews">(38)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Doctor Card 6 -->
+            <div class="doctor-card">
+                <div class="doctor-img"><img src="/img/doctor1.png" alt="Doctor" /></div>
+                <div class="doctor-info">
+                    <h4 class="doctor-name">Kelly Ross</h4>
+                    <div class="doctor-specialty">Obstetrics & Gynecology</div>
+                    <div class="doctor-university">University of California San Francisco<br />Parnassus Campus</div>
+                    <div class="doctor-meta">
+                        <span class="doctor-exp">6 - 10 Yrs Experience</span>
+                        <span class="doctor-days">Tue, Wed, Thu, Fri</span>
+                        <div class="doctor-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="reviews">(38)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pagination mb-5">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </main>
+</div>

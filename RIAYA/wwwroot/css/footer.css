@@ -83,15 +83,15 @@ footer {
     padding: 0;
 }
 
-.footer-links ul li a,
-.footer-services ul li {
-    text-decoration: none;
-    color: #3C618B;
-    margin: 15px 0px;
-}
+    .footer-links ul li a,
+    .footer-services ul li a, .footer-services ul li {
+        text-decoration: none;
+        color: #3C618B;
+        margin: 20px 0px;
+    }
 
 .footer-links ul li {
-    margin: 15px 0px;
+    margin: 13px 0px;
 }
 
 .footer-links ul li a:hover,

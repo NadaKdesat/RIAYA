@@ -49,7 +49,7 @@ public partial class MyDbContext : DbContext
     {
         modelBuilder.Entity<Certificate>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Certific__3214EC07B773C41B");
+            entity.HasKey(e => e.Id).HasName("PK__Certific__3214EC0747CB9A0D");
 
             entity.Property(e => e.CertificateUrl).HasMaxLength(255);
             entity.Property(e => e.Institution).HasMaxLength(255);
@@ -57,12 +57,12 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Provider).WithMany(p => p.Certificates)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__Certifica__Provi__45F365D3");
+                .HasConstraintName("FK__Certifica__Provi__46E78A0C");
         });
 
         modelBuilder.Entity<Contact>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Contact__3214EC072F9745A6");
+            entity.HasKey(e => e.Id).HasName("PK__Contact__3214EC071C485DD6");
 
             entity.ToTable("Contact");
 
@@ -76,7 +76,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<ElectronicConsultation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC07F63E545F");
+            entity.HasKey(e => e.Id).HasName("PK__Electron__3214EC07A6F613D6");
 
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.ConsultationLink).HasMaxLength(500);
@@ -90,20 +90,20 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Electroni__Patie__06CD04F7");
+                .HasConstraintName("FK__Electroni__Patie__4F7CD00D");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__Electroni__Provi__07C12930");
+                .HasConstraintName("FK__Electroni__Provi__5070F446");
 
             entity.HasOne(d => d.Service).WithMany(p => p.ElectronicConsultations)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__Electroni__Servi__08B54D69");
+                .HasConstraintName("FK__Electroni__Servi__5165187F");
         });
 
         modelBuilder.Entity<HealthBlog>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HealthBl__3214EC0774F14E45");
+            entity.HasKey(e => e.Id).HasName("PK__HealthBl__3214EC07E7ABDAF1");
 
             entity.Property(e => e.Category).HasMaxLength(100);
             entity.Property(e => e.ContentUrl).HasMaxLength(255);
@@ -119,7 +119,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<HomeCareAppointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC07BA40F778");
+            entity.HasKey(e => e.Id).HasName("PK__HomeCare__3214EC07564C8F9D");
 
             entity.Property(e => e.ApartmentNumber).HasMaxLength(50);
             entity.Property(e => e.BuildingName).HasMaxLength(100);
@@ -140,20 +140,20 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__HomeCareA__Patie__0D7A0286");
+                .HasConstraintName("FK__HomeCareA__Patie__5629CD9C");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__HomeCareA__Provi__0E6E26BF");
+                .HasConstraintName("FK__HomeCareA__Provi__571DF1D5");
 
             entity.HasOne(d => d.Service).WithMany(p => p.HomeCareAppointments)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__HomeCareA__Servi__0F624AF8");
+                .HasConstraintName("FK__HomeCareA__Servi__5812160E");
         });
 
         modelBuilder.Entity<InstantHomeCareAppointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InstantH__3214EC0701B0D249");
+            entity.HasKey(e => e.Id).HasName("PK__InstantH__3214EC07D6611B6B");
 
             entity.Property(e => e.ApartmentNumber).HasMaxLength(50);
             entity.Property(e => e.BuildingName).HasMaxLength(100);
@@ -177,20 +177,20 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__InstantHo__Patie__5BE2A6F2");
+                .HasConstraintName("FK__InstantHo__Patie__5CD6CB2B");
 
             entity.HasOne(d => d.Provider).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.ProviderId)
-                .HasConstraintName("FK__InstantHo__Provi__5DCAEF64");
+                .HasConstraintName("FK__InstantHo__Provi__5EBF139D");
 
             entity.HasOne(d => d.Service).WithMany(p => p.InstantHomeCareAppointments)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__InstantHo__Servi__5CD6CB2B");
+                .HasConstraintName("FK__InstantHo__Servi__5DCAEF64");
         });
 
         modelBuilder.Entity<JoinU>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__JoinUs__3214EC076998E79B");
+            entity.HasKey(e => e.Id).HasName("PK__JoinUs__3214EC072F708E99");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -203,29 +203,32 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Provider>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Provider__3214EC07CE12DBB1");
+            entity.HasKey(e => e.Id).HasName("PK__Provider__3214EC07EB50E0F7");
 
-            entity.HasIndex(e => e.UserId, "UQ__Provider__1788CC4D9F750605").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Provider__1788CC4D42C8A322").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.LicenseUrl).HasMaxLength(255);
             entity.Property(e => e.Location).HasMaxLength(100);
+            entity.Property(e => e.ProfileImage)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.Specialization).HasMaxLength(100);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Providers)
                 .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Providers__Categ__4222D4EF");
+                .HasConstraintName("FK__Providers__Categ__4316F928");
 
             entity.HasOne(d => d.User).WithOne(p => p.Provider)
                 .HasForeignKey<Provider>(d => d.UserId)
-                .HasConstraintName("FK__Providers__UserI__412EB0B6");
+                .HasConstraintName("FK__Providers__UserI__4222D4EF");
         });
 
         modelBuilder.Entity<ProviderAvailability>(entity =>
         {
-            entity.HasKey(e => e.ProviderAvailabilityId).HasName("PK__Provider__B8DFFA745359E448");
+            entity.HasKey(e => e.ProviderAvailabilityId).HasName("PK__Provider__B8DFFA7469F3CA86");
 
             entity.ToTable("ProviderAvailability");
 
@@ -235,7 +238,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Services__3214EC0716B93143");
+            entity.HasKey(e => e.Id).HasName("PK__Services__3214EC07DB6EBB62");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -246,12 +249,12 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.Services)
                 .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Services__Catego__49C3F6B7");
+                .HasConstraintName("FK__Services__Catego__4AB81AF0");
         });
 
         modelBuilder.Entity<ServiceCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ServiceC__3214EC07401180AE");
+            entity.HasKey(e => e.Id).HasName("PK__ServiceC__3214EC07E51CCDA5");
 
             entity.Property(e => e.CategoryDescription).HasMaxLength(500);
             entity.Property(e => e.CategoryName).HasMaxLength(100);
@@ -262,7 +265,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<SessionRating>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SessionR__3214EC07F239239D");
+            entity.HasKey(e => e.Id).HasName("PK__SessionR__3214EC076F5A7B9D");
 
             entity.Property(e => e.AppointmentType).HasMaxLength(20);
             entity.Property(e => e.CreatedAt)
@@ -272,9 +275,9 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0773864345");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC071C90B45D");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105344BECE344").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D105342371A592").IsUnique();
 
             entity.HasIndex(e => e.GoogleId, "UX_Users_GoogleId")
                 .IsUnique()
@@ -286,6 +289,7 @@ public partial class MyDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.Gender).HasMaxLength(10);
             entity.Property(e => e.GoogleId).HasMaxLength(255);
             entity.Property(e => e.IsGoogleUser).HasDefaultValue(false);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);

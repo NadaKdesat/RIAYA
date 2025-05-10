@@ -17,6 +17,8 @@ public partial class User
 
     public string? City { get; set; }
 
+    public string? Gender { get; set; }
+
     public string? UserType { get; set; }
 
     public bool? IsGoogleUser { get; set; }

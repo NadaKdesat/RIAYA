@@ -3,6 +3,7 @@
 }
 @section Style{
     <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 }
 
 <!--hero-->
@@ -14,10 +15,7 @@
             services, including expert nursing care, physical therapy, and seamless virtual consultations, ensures
             you receive top-quality care tailored to your needs—all in the comfort of your home.
         </p>
-        <button class="btn" onclick="window.location.href='services.html'">Explore Our Services</button>
-    </div>
-    <div class="image">
-        @* <img src="./images/image (5).png" alt="Healthcare"> *@
+        <button class="btn" onclick="window.location.href='@Url.Action("Services", "Service")'">Explore Our Services</button>
     </div>
 </section>
 <!--end hero-->
@@ -25,7 +23,7 @@
 <!--About Us-->
 <div class="about-container">
     <div class="image-wrapper">
-        <img src="~/images/Why_Choose_Us_section.jpg" alt="Healthcare Image">
+        <img src="~/images/Why_Choose_Us_section2.jpg" alt="Healthcare Image">
     </div>
     <div class="text-content">
         <h4>About us</h4>
@@ -35,7 +33,7 @@
             Simple, human, and always by your side.
         </p>
         @* <p>Whether you need a nurse, a physical therapist, or just someone to guide you through recovery, RIAYA connects you with trusted professionals who truly care. Simple, human, and always by your side.</p> *@
-        <button>Read More</button>
+        <button onclick="window.location.href='@Url.Action("About", "Home")'">Read More</button>
         <hr />
         <div class="row border-top border-color-light-black mt-1-4" style="margin:auto; color:#053D76;">
             <div class="col-sm-6 col-md-4 mb-4 mb-md-0">
@@ -117,7 +115,7 @@
                 </div>
                 <div class="card-body p-1-9 pt-2-3">
                     <i class="fa-solid fa-house-medical card-icon display-23"></i>
-                    <h3 class="h5 mb-3"><a href="vaccination.html">Home Care</a></h3>
+                    <h3 class="h5 mb-3"><a href="@Url.Action("Services", "Service")">Home Care</a></h3>
                     <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
                 </div>
             </div>
@@ -129,7 +127,7 @@
                 </div>
                 <div class="card-body p-1-9 pt-2-3">
                     <i class="fa-solid fa-bolt card-icon display-23"></i>
-                    <h3 class="h5 mb-3"><a href="cardiology.html">Instant Service</a></h3>
+                    <h3 class="h5 mb-3"><a href="@Url.Action("Services", "Service")">Instant Service</a></h3>
                     <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
                 </div>
             </div>
@@ -141,7 +139,7 @@
                 </div>
                 <div class="card-body p-1-9 pt-2-3">
                     <i class="fa-solid fa-user-doctor card-icon display-23"></i>
-                    <h3 class="h5 mb-3"><a href="family-physician.html">Electronic Consultations</a></h3>
+                    <h3 class="h5 mb-3"><a href="@Url.Action("Services", "Service")">Electronic Consultations</a></h3>
                     <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
                 </div>
             </div>
@@ -153,7 +151,7 @@
                 </div>
                 <div class="card-body p-1-9 pt-2-3">
                     <i class="fa-solid fa-robot card-icon display-23"></i>
-                    <h3 class="h5 mb-3"><a href="emergency-care.html">Digital Health Advisor</a></h3>
+                    <h3 class="h5 mb-3"><a href="@Url.Action("Services", "Service")">Digital Health Advisor</a></h3>
                     <p class="mb-0">We are give best quality health service &amp; facility of latest technology.</p>
                 </div>
             </div>
@@ -166,60 +164,184 @@
     <p class="section-title">News & Blogs</p>
     <h2 class="section-subtitle">Latest News Feeds</h2>
 
-    <div class="row mt-n1-9">
+    <!-- Swiper Container -->
+    <div class="blogs-swiper-wrapper">
+        <div class="swiper blogs-swiper">
+            <div class="swiper-wrapper">
 
-        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="200ms" style="visibility: visible; animation-delay: 200ms; animation-name: fadeIn;">
-            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
-                <div class="card-image">
-                    <img src="~/images/blog-01.jpg" class="border-top-10-radius" alt="...">
-                </div>
-                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
-                    <span class="card-icon font-weight-700">08 May</span>
-                    <div class="mb-3">
-                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Hospital</a></span>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-01.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">08 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Hospital</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Why are children so obsessed with hospital.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
                     </div>
-                    <h3 class="h4 mb-3"><a href="blog-details.html">Why are children so obsessed with hospital.</a></h3>
-                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
                 </div>
-            </article>
-        </div>
 
-        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="400ms" style="visibility: visible; animation-delay: 400ms; animation-name: fadeIn;">
-            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
-                <div class="card-image">
-                    <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
-                </div>
-                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
-                    <span class="card-icon font-weight-700">04 May</span>
-                    <div class="mb-3">
-                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">04 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
                     </div>
-                    <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
-                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
                 </div>
-            </article>
-        </div>
 
-        <div class="col-md-6 col-lg-4 mt-1-9 wow fadeIn" data-wow-delay="600ms" style="visibility: visible; animation-delay: 600ms; animation-name: fadeIn;">
-            <article class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
-                <div class="card-image">
-                    <img src="~/images/blog-03.jpg" class="border-top-10-radius" alt="...">
-                </div>
-                <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
-                    <span class="card-icon font-weight-700">01 May</span>
-                    <div class="mb-3">
-                        <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span> <span class=" ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Surgery</a></span>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-03.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">01 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Surgery</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Five doubts you should clarify about surgery.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
                     </div>
-                    <h3 class="h4 mb-3"><a href="blog-details.html">Five doubts you should clarify about surgery.</a></h3>
-                    <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
                 </div>
-            </article>
-        </div>
 
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-03.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">01 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Surgery</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Five doubts you should clarify about surgery.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">04 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-03.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">01 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Surgery</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Five doubts you should clarify about surgery.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">04 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card card-style04 border-0 primary-shadow border-radius-10 h-100">
+                        <div class="card-image">
+                            <img src="~/images/blog-02.jpg" class="border-top-10-radius" alt="...">
+                        </div>
+                        <div class="card-body p-1-6 p-sm-1-9 pt-2-3">
+                            <span class="card-icon font-weight-700">04 May</span>
+                            <div class="mb-3">
+                                <span class="text-capitalize"><i class="far fa-user text-secondary"></i> <a href="#!">admin</a></span>
+                                <span class="ms-3 d-inline-block"><i class="fa-solid fa-tags text-secondary"></i> <a href="#!">Family Physician</a></span>
+                            </div>
+                            <h3 class="h4 mb-3"><a href="blog-details.html">Seven reasons why family physician is common.</a></h3>
+                            <a href="blog-details.html" class="read-more">read more <i class="fas fa-arrow-right align-middle ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom arrows under carousel -->
+            <div class="swiper-custom-nav d-flex justify-content-center mt-4">
+                <div class="swiper-button-prev custom-nav-btn me-2"></div>
+                <div class="swiper-button-next custom-nav-btn ms-2"></div>
+            </div>
+        </div>
     </div>
+
 </section>
 <!--End Blogs-->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-@section Scripts{
+    <script>
+        var swiper = new Swiper('.blogs-swiper', {
+            slidesPerView: 3,
+            spaceBetween: 30,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                // Responsive
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 10
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                992: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                }
+            },
+            loop: true,
+            centeredSlides: false, 
+        });
+    </script>
 
 }
+
