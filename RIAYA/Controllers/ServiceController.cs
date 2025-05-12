@@ -281,7 +281,7 @@ namespace RIAYA.Controllers
             return Json(new { success = true, message = "Your consultation appointment has been successfully created!" });
         }
 
-        public IActionResult HealthcareTeam(string? specialty, string? gender, int? minExperience, int? maxExperience, string? sortBy)
+        public IActionResult HealthcareTeam(string? specialty, string? gender, int? minExperience, int? maxExperience, string? sortBy, string? searchQuery)
         {
             // جلب جميع التخصصات (بدون فلترة)
             var allCategories = _context.ServiceCategories
@@ -314,6 +314,11 @@ namespace RIAYA.Controllers
             if (maxExperience.HasValue)
             {
                 query = query.Where(p => p.YearsOfExperience <= maxExperience.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(p => p.User.FullName.Contains(searchQuery));
             }
 
             // تطبيق الترتيب حسب الخبرة أو التقييم إذا تم تحديده
@@ -350,6 +355,7 @@ namespace RIAYA.Controllers
             ViewData["AllCategories"] = allCategories;
             ViewData["SelectedCategoryName"] = specialty;
             ViewData["SelectedSortBy"] = sortBy; // حفظ القيمة المحددة للترتيب
+            ViewData["SearchQuery"] = searchQuery;
 
             return View(providersWithCategories);
         }

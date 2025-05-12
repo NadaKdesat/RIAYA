@@ -945,3 +945,67 @@ body {
 .range-slider-wrapper label {
     color: #4b637e;
 }
+
+.search-container {
+    width: 100%;
+    padding: 0px 0 20px;
+    background-color: #f8f9fa;
+}
+
+.search-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .search-box input[type="text"] {
+        width: 100%;
+        padding: 12px 14px;
+        padding-right: 50px;
+        border: 2px solid #003366;
+        border-radius: 12px;
+        font-size: 16px;
+        color: #4b637e;
+        background-color: white;
+        transition: all 0.3s ease;
+    }
+
+        .search-box input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 51, 102, 0.3);
+        }
+
+        .search-box input[type="text"]::placeholder {
+            color: #8a9db3;
+        }
+
+.search-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .search-btn:hover {
+        background-color: #002244;
+    }
+
+    .search-btn i {
+        font-size: 16px;
+    }

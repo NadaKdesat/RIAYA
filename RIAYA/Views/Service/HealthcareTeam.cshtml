@@ -13,6 +13,20 @@
 
 <div class="container doctors-list-content">
     <aside class="filters">
+        <div class="search-container">
+            <form method="get" asp-action="HealthcareTeam" asp-controller="Service" class="search-form">
+                <div class="search-box">
+                    <input type="text" name="searchQuery" placeholder="Search by doctor's name..." value="@ViewData["SearchQuery"]" />
+                    <button type="submit" class="search-btn">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+                <input type="hidden" name="specialty" value="@ViewData["SelectedCategoryName"]" />
+                <input type="hidden" name="gender" value="@ViewData["SelectedGender"]" />
+                <input type="hidden" name="minExperience" value="@ViewData["SelectedMinExperience"]" />
+                <input type="hidden" name="maxExperience" value="@ViewData["SelectedMaxExperience"]" />
+            </form>
+        </div>
         <div class="filter-section">
             <h3 class="filter-title">Specialty</h3>
             <ul class="filter-list">
@@ -55,8 +69,8 @@
 
                     <!-- نعيد إرسال القيم المختارة للتخصص و الخبرة لو في -->
                     <input type="hidden" name="specialty" value="@ViewData["SelectedCategoryName"]" />
-                    <input type="hidden" name="minExperience" value="" />
-                    <input type="hidden" name="maxExperience" value="" />
+                    <input type="hidden" name="minExperience" value="@ViewData["SelectedMinExperience"]" />
+                    <input type="hidden" name="maxExperience" value="@ViewData["SelectedMaxExperience"]" />
                 </div>
             </form>
         </div>
@@ -81,6 +95,7 @@
 
                     <input type="hidden" name="specialty" value="@ViewData["SelectedCategoryName"]" />
                     <input type="hidden" name="gender" value="@ViewData["SelectedGender"]" />
+                    <input type="hidden" name="gender" value="@ViewData["SearchQuery"]" />
                 </form>
             </div>
 

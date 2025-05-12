@@ -1,0 +1,46 @@
+﻿@model List<RIAYA.Models.HealthBlog>
+@{
+    ViewData["Title"] = "Knowledge Capsule";
+}
+@section Style {
+    <link rel="stylesheet" href="~/css/knowledgeCapsule.css" asp-append-version="true" />
+}
+
+<section class="about-us">
+    <h1>Knowledge Capsules</h1>
+    <p>Your daily dose of health insights, nutrition tips, and medical wisdom — one capsule at a time</p>
+</section>
+<div class="blog-section">
+    @* <div class="blog-header">
+        <div style="color:#3C618B;font-size:1.1rem;font-weight:600;">Blog</div>
+        <h2>Our Latest News</h2>
+        <p>Expert team committed to helping all with hope.</p>
+    </div> *@
+    <div class="blog-grid">
+        @foreach (var blog in Model)
+        {
+            <div class="blog-card">
+                @if (!string.IsNullOrEmpty(blog.ContentUrl))
+                {
+                    <img src="@blog.ContentUrl" class="blog-img" alt="Blog image" />
+                }
+                else
+                {
+                    <div class="blog-img"></div>
+                }
+                <div class="blog-content">
+                    <div class="blog-date">
+                        @blog.PublishDate?.ToString("dd MMM, yyyy")
+                    </div>
+                    <div class="blog-title">@blog.Title</div>
+                    <div class="blog-desc">
+                        @(blog.Content?.Length > 110 ? blog.Content.Substring(0, 110) + "..." : blog.Content)
+                    </div>
+                    <a class="blog-readmore" href="#">Read More &rarr;</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
