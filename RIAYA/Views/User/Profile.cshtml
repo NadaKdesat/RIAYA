@@ -29,8 +29,7 @@
                 <div class="button-group mt-4 row">
                     <input type="button" id="editBtn" value="Edit Profile" data-bs-toggle="modal" data-bs-target="#editProfileModal" style="cursor: pointer;">
                     <input type="button" id="passwordBtn" value="Change Password" data-bs-toggle="modal" data-bs-target="#changePasswordModal" style="cursor: pointer;">
-                    <input type="button" id="bookingsBtn" value="My Bookings" data-bs-toggle="modal" data-bs-target="#viewBookingsModal" style="cursor: pointer;">
-
+                    <input type="button" id="bookingsBtn" value="My Bookings" data-bs-toggle="modal" data-bs-target="#viewBookingsModal" style="cursor: pointer;" onclick="loadBookings()">
                 </div>
             </form>
         </div>
@@ -136,10 +135,11 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Service</th>
+                                            <th>Service Name</th>
                                             <th>Date</th>
                                             <th>Location</th>
                                             <th>Status</th>
+                                            <th>Booking Type</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -157,13 +157,15 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Service</th>
+                                            <th>Service Name</th>
                                             <th>Date</th>
                                             <th>Location</th>
                                             <th>Status</th>
+                                            <th>Booking Type</th>
                                             <th>Rating</th>
                                         </tr>
                                     </thead>
+
                                     <tbody id="previousBookingsTableBody">
                                         <!-- Previous bookings will be loaded here -->
                                     </tbody>
@@ -174,12 +176,6 @@
                             </div>
                         </div>
                     </div>
-                    @* <div id="loadingBookings" class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Loading your bookings...</p>
-                    </div> *@
                 </div>
                 <div class="modal-footer me-3 mb-3">
                     @* <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> *@
@@ -224,6 +220,63 @@
 
     });
 });
+
+
+
+        function loadBookings() {
+                            fetch('/User/GetUserBookings')
+                .then(response => response.json())
+                .then(data => {
+                            console.log(data);
+                    const upcomingTableBody = document.getElementById('upcomingBookingsTableBody');
+                    const previousTableBody = document.getElementById('previousBookingsTableBody');
+
+                    upcomingTableBody.innerHTML = '';
+                    previousTableBody.innerHTML = '';
+
+                    const now = new Date();
+
+                    data.forEach(booking => {
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${booking.serviceName}</td>
+                            <td>${new Date(booking.appointmentDateTime).toLocaleString()}</td>
+                            <td>${booking.location}</td>
+                            <td>${booking.status}</td>
+                            <td>${booking.bookingType}</td>
+                            <td>
+                                ${booking.canCancel ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${booking.id}, '${booking.bookingType}')">Cancel</button>` : ''}
+                            </td>
+                        `;
+
+                        if (new Date(booking.appointmentDateTime) > now) {
+                            upcomingTableBody.appendChild(row);
+                        } else {
+                            previousTableBody.appendChild(row);
+                        }
+                    });
+
+                    document.getElementById('noUpcomingBookings').classList.toggle('d-none', upcomingTableBody.children.length > 0);
+                    document.getElementById('noPreviousBookings').classList.toggle('d-none', previousTableBody.children.length > 0);
+                });
+        }
+
+        function cancelBooking(id, type) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                                fetch(`/User/CancelBooking?id=${id}&type=${type}`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Booking canceled successfully.');
+                        loadBookings();
+                    } else {
+                        alert('Failed to cancel booking.');
+                    }
+                });
+            }
+        }
 
     </script>
 }

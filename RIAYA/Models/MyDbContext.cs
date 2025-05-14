@@ -210,6 +210,7 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.LicenseUrl).HasMaxLength(255);
             entity.Property(e => e.Location).HasMaxLength(100);
             entity.Property(e => e.ProfileImage)

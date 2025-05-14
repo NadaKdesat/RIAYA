@@ -19,6 +19,8 @@ public partial class Service
 
     public DateTime? CreatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     public virtual ServiceCategory? Category { get; set; }
 
     public virtual ICollection<ElectronicConsultation> ElectronicConsultations { get; set; } = new List<ElectronicConsultation>();

@@ -374,6 +374,99 @@ namespace RIAYA.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public async Task<IActionResult> GetUserBookings()
+        {
+            string userIdString = HttpContext.Session.GetString("UserId")
+                                   ?? Request.Cookies["UserId"]
+                                   ?? "";
+
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return BadRequest("Invalid UserId");
+            }
+
+            var electronicConsultations = await _context.ElectronicConsultations
+                .Where(e => e.PatientId == userId)
+                .Select(e => new BookingViewModel
+                {
+                    Id = e.Id,
+                    ServiceName = e.ServiceName,
+                    AppointmentDateTime = e.AppointmentDate.ToDateTime(e.AppointmentTime),
+                    Location = "Online",
+                    Status = e.IsConfirmed == true ? "Confirmed" : "Pending",
+                    BookingType = "ElectronicConsultation",
+                    CanCancel = e.AppointmentDate.ToDateTime(e.AppointmentTime) > DateTime.Now
+                }).ToListAsync();
+
+            var homeCareAppointments = await _context.HomeCareAppointments
+                .Where(h => h.PatientId == userId)
+                .Select(h => new BookingViewModel
+                {
+                    Id = h.Id,
+                    ServiceName = h.ServiceName,
+                    AppointmentDateTime = h.AppointmentDate.ToDateTime(h.AppointmentTime),
+                    Location = $"{h.BuildingName}, {h.StreetName}",
+                    Status = h.IsConfirmed == true ? "Confirmed" : "Pending",
+                    BookingType = "HomeCareAppointment",
+                    CanCancel = h.AppointmentDate.ToDateTime(h.AppointmentTime) > DateTime.Now
+                }).ToListAsync();
+
+            var instantHomeCareAppointments = await _context.InstantHomeCareAppointments
+                .Where(i => i.PatientId == userId)
+                .Select(i => new BookingViewModel
+                {
+                    Id = i.Id,
+                    ServiceName = i.ServiceName,
+                    AppointmentDateTime = i.CreatedAt ?? DateTime.MinValue,
+                    Location = $"{i.BuildingName}, {i.StreetName}",
+                    Status = i.IsConfirmed == true ? "Confirmed" : "Pending",
+                    BookingType = "InstantHomeCareAppointment",
+                    CanCancel = (i.CreatedAt ?? DateTime.MinValue) > DateTime.Now
+                }).ToListAsync();
+
+            var allBookings = electronicConsultations
+                .Concat(homeCareAppointments)
+                .Concat(instantHomeCareAppointments)
+                .OrderBy(b => b.AppointmentDateTime)
+                .ToList();
+
+            return Json(allBookings);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CancelBooking(int id, string type)
+        {
+            switch (type)
+            {
+                case "ElectronicConsultation":
+                    var ec = await _context.ElectronicConsultations.FindAsync(id);
+                    if (ec != null)
+                    {
+                        _context.ElectronicConsultations.Remove(ec);
+                    }
+                    break;
+                case "HomeCareAppointment":
+                    var hc = await _context.HomeCareAppointments.FindAsync(id);
+                    if (hc != null)
+                    {
+                        _context.HomeCareAppointments.Remove(hc);
+                    }
+                    break;
+                case "InstantHomeCareAppointment":
+                    var ihc = await _context.InstantHomeCareAppointments.FindAsync(id);
+                    if (ihc != null)
+                    {
+                        _context.InstantHomeCareAppointments.Remove(ihc);
+                    }
+                    break;
+                default:
+                    return BadRequest();
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
     }
 }

@@ -4,157 +4,452 @@
 }
 @section Style {
     <link href="~/css/adminDashboard.css" rel="stylesheet" asp-append-version="true" />
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 }
 
-<div class="dashboard">
-    <div class="card">
-        <i class="fas fa-users"></i>
-        <h2 id="employees">@ViewData["TotalEmployees"]</h2>
-        <p>Employees</p>
+<div class="container-fluid px-4">
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Summary Cards -->
+    <div class="row">
+        <!-- Total Users Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="title">Total Users</div>
+                    <div class="value">@ViewBag.TotalUsers</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Providers Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="title">Total Providers</div>
+                    <div class="value">@ViewBag.TotalProviders</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Appointments Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="title">Total Appointments</div>
+                    <div class="value">@ViewBag.TotalAppointments</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>All Time</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Earnings Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="title">Total Earnings</div>
+                    <div class="value">$@ViewBag.TotalEarnings.ToString("F2")</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Commission</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Session Rating Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="title">Average Session Rating</div>
+                    <div class="value">@ViewBag.AverageRating.ToString("F1")</div>
+                    <div class="trend up">
+                        <i class="fas fa-star"></i>
+                        <span>Out of 5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Appointments Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="summary-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="title">Today's Appointments</div>
+                    <div class="value">@ViewBag.TodayAppointments</div>
+                    <div class="trend up">
+                        <i class="fas fa-calendar"></i>
+                        <span>@DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <i class="fas fa-user-tie"></i>
-        <h2 id="managers">@ViewData["TotalManagers"]</h2>
-        <p>Managers</p>
+    <!-- Charts -->
+    <div class="row">
+        <!-- User Growth Chart -->
+        <div class="col-xl-8 mb-4">
+            <div class="chart-container">
+                <h5>User Growth (Last 7 Days)</h5>
+                <canvas id="userGrowthChart" style="max-height:450px !important; min-height:450px !important;"></canvas>
+            </div>
+        </div>
+
+        <!-- Appointment Type Distribution Chart -->
+        <div class="col-xl-4 mb-4">
+            <div class="chart-container">
+                <h5>Appointment Type Distribution</h5>
+                <canvas id="appointmentTypeChart" style="max-height:450px !important; min-height:450px !important;"></canvas>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <i class="fas fa-building"></i>
-        <h2 id="departments">@ViewData["TotalDepartments"]</h2>
-        <p>Departments</p>
+    <div class="row">
+        <!-- Appointments by Type Chart -->
+        <div class="col-xl-12 mb-4">
+            <div class="chart-container">
+                <h5>Appointments by Type (Last 30 Days)</h5>
+                <canvas id="appointmentsByTypeChart" style="max-height:450px !important;  min-height:450px !important;"></canvas>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <i class="fas fa-calendar-check"></i>
-        <h2 id="leaveRequests">@ViewData["PendingVacations_Leaves"]</h2>
-        <p>Pending Leave & Vacation Requests</p>
-    </div>
-
-    <div class="card">
-        <i class="fas fa-comment-alt"></i>
-        <h2 id="feedbacks">@ViewData["TotalFeedbacks"]</h2>
-        <p>Feedbacks</p>
-    </div>
-
-    <div class="card">
-        <i class="fas fa-star"></i>
-        <h2 id="evaluations">@ViewData["TotalEvaluations"]</h2>
-        <p>Evaluations</p>
+    <!-- Recent Session Ratings Table -->
+    <div class="row">
+        <div class="col-xl-12 mb-4">
+            <div class="table-container">
+                <h5>Recent Session Ratings</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="ratingsTable">
+                        <thead>
+                            <tr>
+                                <th>User Name</th>
+                                <th>Provider Name</th>
+                                <th>Rating</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.RecentRatings != null)
+                            {
+                                foreach (var rating in ViewBag.RecentRatings)
+                                {
+                                    <tr>
+                                        <td>@(rating.AppointmentType == "ElectronicConsultation" ? "Electronic User" : "Home Care User")</td>
+                                        <td>Provider #@rating.AppointmentId</td>
+                                        <td>
+                                            <div class="rating">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= rating.Rating)
+                                                    {
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star text-warning"></i>
+                                                    }
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>@(rating.CreatedAt?.ToString("MMM dd, yyyy") ?? "N/A")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#ratingsTable').DataTable({
+                "pageLength": 5,
+                "lengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
+                "language": {
+                    "search": "Search ratings:"
+                }
+            });
 
+            // Prepare data for charts
+        @{
+            // Prepare user growth data
+            var userGrowthLabels = new List<string>();
+            var userGrowthData = new List<int>();
+            if (ViewBag.UserGrowthData != null)
+            {
+                foreach (var item in ViewBag.UserGrowthData)
+                {
+                    userGrowthLabels.Add(item.date);
+                    userGrowthData.Add(item.count);
+                }
+            }
 
-<!------------------------------------------------------------------------------------------------------------------------------>
+            // Prepare appointment type distribution data
+            var appointmentTypeLabels = new List<string>();
+            var appointmentTypeData = new List<int>();
+            if (ViewBag.AppointmentTypeDistribution != null)
+            {
+                foreach (var item in ViewBag.AppointmentTypeDistribution)
+                {
+                    appointmentTypeLabels.Add(item.type);
+                    appointmentTypeData.Add(item.count);
+                }
+            }
+        }
 
-<div class="tables-wrapper">
-    <!-- القسم الأول: الجدول الأول والثاني -->
-    <div class="table-group">
-        <div class="table-container">
-            <h5>Departments & Managers</h5>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Department</th>
-                        <th>Manager</th>
-                        <th>Employees Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @* @foreach (var dept in ViewData["Departments"] as IEnumerable<dynamic>)
-                    {
-                        <tr>
-                            <td>@dept.DepartmentName</td>
-                            <td>@(dept.ManagerName ?? "No Manager")</td>
-                            <td>@dept.EmployeesCount</td>
-                        </tr>
-                    } *@
+            // User Growth Chart
+            var userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+            var userGrowthChart = new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(userGrowthLabels)),
+                    datasets: [{
+                        label: 'New Users',
+                        data: @Html.Raw(Json.Serialize(userGrowthData)),
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
 
-                </tbody>
-            </table>
-        </div>
+            // Appointment Type Distribution Chart (Pie)
+            var appointmentTypeCtx = document.getElementById('appointmentTypeChart').getContext('2d');
+            var appointmentTypeChart = new Chart(appointmentTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(appointmentTypeLabels)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(appointmentTypeData)),
+                        backgroundColor: [
+                            'rgba(78, 115, 223, 0.8)',
+                            'rgba(28, 200, 138, 0.8)',
+                            'rgba(246, 194, 62, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(78, 115, 223, 1)',
+                            'rgba(28, 200, 138, 1)',
+                            'rgba(246, 194, 62, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
 
-        <div class="table-container">
-            <h5>Recent Leave Requests</h5>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Employee</th>
-                        <th>Leave Type</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Leave Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @* @foreach (var leave in ViewData["LeaveRequests"] as IEnumerable<dynamic>)
-                    {
-                        <tr>
-                            <td>@leave.EmployeeName</td>
-                            <td>@leave.LeaveType</td>
-                            <td>@leave.StartTime</td>
-                            <td>@leave.EndTime</td>
-                            <td>@leave.LeaveDate</td>
-                            <td class="@leave.Status.ToLower()">@leave.Status</td>
-                        </tr>
-                    } *@
-                </tbody>
-            </table>
-        </div>
-    </div>
+            // Appointments by Type Chart (Bar)
+            var appointmentsByTypeCtx = document.getElementById('appointmentsByTypeChart').getContext('2d');
 
-    <!-- القسم الثاني: الجدول الثالث والرابع -->
-    <div class="table-group">
-        <div class="table-container">
-            <h5>Employee Evaluations</h5>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Employee</th>
-                        <th>Manager</th>
-                        <th>Comments</th>
-                        <th>Evaluate Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @* @foreach (var eval in ViewData["Evaluations"] as IEnumerable<dynamic>)
-                    {
-                        <tr>
-                            <td>@eval.EmployeeName</td>
-                            <td>@eval.Status</td>
-                            <td>@eval.Comment</td>
-                            <td>@eval.DateEvaluate.ToShortDateString()</td>
-                        </tr>
-                    } *@
-                </tbody>
-            </table>
-        </div>
+            // Prepare data for the chart
+            var dates = [];
+            var electronicData = [];
+            var instantHomeCareData = [];
+            var homeCareData = [];
 
-        <div class="table-container">
-            <h5>Feedback Messages</h5>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Date</th>
-                        <th>Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @* @foreach (var feedback in ViewData["Feedbacks"] as IEnumerable<dynamic>)
-                    {
-                        <tr>
-                            <td>@feedback.Name</td>
-                            <td>@feedback.Email</td>
-                            <td>@feedback.Date.ToShortDateString()</td>
-                            <td>@feedback.Message</td>
-                        </tr>
-                    } *@
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+            // Get unique dates from all datasets
+            var allDates = new Set();
+
+        @if (ViewBag.ElectronicConsultationsByDay != null)
+        {
+            foreach (var item in ViewBag.ElectronicConsultationsByDay)
+            {
+                <text>
+                            allDates.add('@item.date');
+                </text>
+            }
+        }
+
+        @if (ViewBag.InstantHomeCareByDay != null)
+        {
+            foreach (var item in ViewBag.InstantHomeCareByDay)
+            {
+                <text>
+                            allDates.add('@item.date');
+                </text>
+            }
+        }
+
+        @if (ViewBag.HomeCareByDay != null)
+        {
+            foreach (var item in ViewBag.HomeCareByDay)
+            {
+                <text>
+                            allDates.add('@item.date');
+                </text>
+            }
+        }
+
+            // Convert Set to Array and sort
+            dates = Array.from(allDates).sort();
+
+            // Fill data arrays
+        @if (ViewBag.ElectronicConsultationsByDay != null)
+        {
+            foreach (var item in ViewBag.ElectronicConsultationsByDay)
+            {
+                <text>
+                            electronicData.push({ date: '@item.date', count: @item.count });
+                </text>
+            }
+        }
+
+        @if (ViewBag.InstantHomeCareByDay != null)
+        {
+            foreach (var item in ViewBag.InstantHomeCareByDay)
+            {
+                <text>
+                            instantHomeCareData.push({ date: '@item.date', count: @item.count });
+                </text>
+            }
+        }
+
+        @if (ViewBag.HomeCareByDay != null)
+        {
+            foreach (var item in ViewBag.HomeCareByDay)
+            {
+                <text>
+                            homeCareData.push({ date: '@item.date', count: @item.count });
+                </text>
+            }
+        }
+
+            // Prepare final data arrays for the chart
+            var electronicCounts = dates.map(date => {
+                var item = electronicData.find(d => d.date === date);
+                return item ? item.count : 0;
+            });
+
+            var instantHomeCareCounts = dates.map(date => {
+                var item = instantHomeCareData.find(d => d.date === date);
+                return item ? item.count : 0;
+            });
+
+            var homeCareCounts = dates.map(date => {
+                var item = homeCareData.find(d => d.date === date);
+                return item ? item.count : 0;
+            });
+
+            var appointmentsByTypeChart = new Chart(appointmentsByTypeCtx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Electronic Consultations',
+                            data: electronicCounts,
+                            backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Instant Home Care',
+                            data: instantHomeCareCounts,
+                            backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                            borderColor: 'rgba(28, 200, 138, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Home Care',
+                            data: homeCareCounts,
+                            backgroundColor: 'rgba(246, 194, 62, 0.8)',
+                            borderColor: 'rgba(246, 194, 62, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

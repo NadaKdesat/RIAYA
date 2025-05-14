@@ -25,6 +25,8 @@ public partial class Provider
 
     public string? ProfileImage { get; set; }
 
+    public bool IsActive { get; set; }
+
     public virtual ServiceCategory? Category { get; set; }
 
     public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();

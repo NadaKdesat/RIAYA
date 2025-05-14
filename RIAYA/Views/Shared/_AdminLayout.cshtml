@@ -36,6 +36,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Categories" ? "active" : "")"
+                               asp-area="" asp-controller="Admin" asp-action="Categories">
+                                Categories
+                            </a>
+                        </li>
+@*                         <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Services" ? "active" : "")"
+                               asp-area="" asp-controller="Admin" asp-action="Services">
+                                Services
+                            </a>
+                        </li> *@
+                        <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Providers" ? "active" : "")"
                                asp-area="" asp-controller="Admin" asp-action="Providers">
                                 Providers
@@ -45,12 +57,6 @@
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")"
                                asp-area="" asp-controller="Admin" asp-action="Users">
                                 Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Categories" ? "active" : "")"
-                               asp-area="" asp-controller="Admin" asp-action="Categories">
-                                Categories
                             </a>
                         </li>
                         <li class="nav-item">

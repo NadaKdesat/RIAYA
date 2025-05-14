@@ -26,8 +26,8 @@ body, html {
 }
 
     .sidebar .logo {
-        width:125px;
-        margin-bottom: 20px;
+        width: 125px;
+        margin-bottom: 10px;
     }
 
     .sidebar .icon {
@@ -274,4 +274,8 @@ body, html {
     color: #053D76; /* تأكيد لون النص */
     font-weight: bold; /* زيادة سماكة الخط */
     border-radius: 5px;
+}
+
+footer {
+    padding: 30px 20px 0px 20px;
 }
