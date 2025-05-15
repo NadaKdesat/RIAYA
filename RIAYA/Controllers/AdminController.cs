@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
 namespace RIAYA.Controllers
 {
@@ -168,128 +170,165 @@ namespace RIAYA.Controllers
             }
         }
 
-        public async Task<IActionResult> Providers()
-        {
-            try
-            {
-                var providers = await _context.Providers
-                    .Include(p => p.User)
-                    .Include(p => p.Category)
-                    .Include(p => p.Certificates)
-                    .ToListAsync();
-
-                return View(providers);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View(new List<Provider>());
-            }
-        }
-
-        public async Task<IActionResult> Users()
-        {
-            try
-            {
-                var users = await _context.Users
-                    .Include(u => u.Provider)
-                    .ToListAsync();
-
-                return View(users);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View(new List<User>());
-            }
-        }
         public async Task<IActionResult> Categories()
         {
-            try
-            {
-                var categories = await _context.ServiceCategories
-                    .Include(c => c.Services)
-                    .Include(c => c.Providers)
-                    .ToListAsync();
+            var categories = await _context.ServiceCategories
+                .Where(c => !c.IsDeleted)
+                .Include(c => c.Services.Where(s => !s.IsDeleted))
+                .Include(c => c.Providers.Where(p => p.IsActive))
+                .ToListAsync();
 
-                return View(categories);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View(new List<ServiceCategory>());
-            }
+            return View(categories);
         }
-        public async Task<IActionResult> Reservations()
+
+        [HttpPost]
+        public async Task<IActionResult> addCategory(string categoryName, string categoryDescription)
         {
             try
             {
-                var electronicConsultations = await _context.ElectronicConsultations
-                    .Include(ec => ec.Patient)
-                    .Include(ec => ec.Provider)
-                    .Include(ec => ec.Service)
-                    .ToListAsync();
+                if (string.IsNullOrWhiteSpace(categoryName))
+                {
+                    TempData["ErrorMessage"] = "Category name is required.";
+                    return RedirectToAction("Categories");
+                }
 
-                var homeCareAppointments = await _context.HomeCareAppointments
-                    .Include(hc => hc.Patient)
-                    .Include(hc => hc.Provider)
-                    .Include(hc => hc.Service)
-                    .ToListAsync();
+                var newCategory = new ServiceCategory
+                {
+                    CategoryName = categoryName,
+                    CategoryDescription = categoryDescription,
+                    CreatedAt = DateTime.Now,
+                    IsDeleted = false
+                };
 
-                var instantHomeCareAppointments = await _context.InstantHomeCareAppointments
-                    .Include(ihc => ihc.Patient)
-                    .Include(ihc => ihc.Provider)
-                    .Include(ihc => ihc.Service)
-                    .ToListAsync();
+                await _context.ServiceCategories.AddAsync(newCategory);
+                await _context.SaveChangesAsync();
 
-                ViewBag.ElectronicConsultations = electronicConsultations;
-                ViewBag.HomeCareAppointments = homeCareAppointments;
-                ViewBag.InstantHomeCareAppointments = instantHomeCareAppointments;
-
-                return View();
+                TempData["SuccessMessage"] = "Category added successfully!";
+                return RedirectToAction("Categories");
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View();
-            }
-        }
-        public async Task<IActionResult> ContactUs()
-        {
-            try
-            {
-                var contacts = await _context.Contacts
-                    .OrderByDescending(c => c.CreatedAt)
-                    .ToListAsync();
-
-                return View(contacts);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View(new List<Contact>());
-            }
-        }
-        public async Task<IActionResult> HealthBlogs()
-        {
-            try
-            {
-                var blogs = await _context.HealthBlogs
-                    .OrderByDescending(b => b.PublishDate)
-                    .ToListAsync();
-
-                return View(blogs);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Error: {ex.Message}";
-                return View(new List<HealthBlog>());
+                TempData["ErrorMessage"] = $"Error adding category: {ex.Message}";
+                return RedirectToAction("Categories");
             }
         }
 
-        public async Task<IActionResult> Services()
+        public async Task<IActionResult> DownloadCategoriesPDF()
         {
-                return View();
+            var categories = await _context.ServiceCategories
+                .Where(c => !c.IsDeleted)
+                .Include(c => c.Services.Where(s => !s.IsDeleted))
+                .Include(c => c.Providers.Where(p => p.IsActive))
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync();
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                Document document = new Document(PageSize.A4);
+                PdfWriter.GetInstance(document, stream);
+                document.Open();
+
+                // Main title
+                iTextSharp.text.Font titleFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY);
+                Paragraph title = new Paragraph("Service Categories Report", titleFont)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = 20f
+                };
+                document.Add(title);
+
+                // Date and time
+                iTextSharp.text.Font dateFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA, 10, BaseColor.GRAY);
+                Paragraph date = new Paragraph($"Generated on: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}", dateFont)
+                {
+                    Alignment = Element.ALIGN_RIGHT,
+                    SpacingAfter = 20f
+                };
+                document.Add(date);
+
+                // Categories table
+                PdfPTable table = new PdfPTable(4)
+                {
+                    WidthPercentage = 100
+                };
+
+                // Set column widths
+                float[] columnWidths = new float[] { 30f, 40f, 15f, 15f };
+                table.SetWidths(columnWidths);
+
+                // Table headers
+                iTextSharp.text.Font headerFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
+                string[] headers = { "Category Name", "Description", "Services", "Providers" };
+
+                foreach (var header in headers)
+                {
+                    PdfPCell cell = new PdfPCell(new Phrase(header, headerFont))
+                    {
+                        BackgroundColor = new BaseColor(5, 61, 118), // Primary color from your CSS
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        Padding = 8,
+                        BorderColor = BaseColor.WHITE
+                    };
+                    table.AddCell(cell);
+                }
+
+                // Add data rows
+                iTextSharp.text.Font dataFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA, 10);
+                iTextSharp.text.Font countFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 10, BaseColor.DARK_GRAY);
+
+                foreach (var category in categories)
+                {
+                    // Category Name
+                    PdfPCell nameCell = new PdfPCell(new Phrase(category.CategoryName, dataFont))
+                    {
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        Padding = 8,
+                        BorderColor = BaseColor.LIGHT_GRAY
+                    };
+                    table.AddCell(nameCell);
+
+                    // Description
+                    PdfPCell descCell = new PdfPCell(new Phrase(category.CategoryDescription ?? "No description", dataFont))
+                    {
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        Padding = 8,
+                        BorderColor = BaseColor.LIGHT_GRAY
+                    };
+                    table.AddCell(descCell);
+
+                    // Services Count
+                    PdfPCell servicesCell = new PdfPCell(new Phrase(category.Services.Count.ToString(), countFont))
+                    {
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        Padding = 8,
+                        BorderColor = BaseColor.LIGHT_GRAY
+                    };
+                    table.AddCell(servicesCell);
+
+                    // Providers Count
+                    PdfPCell providersCell = new PdfPCell(new Phrase(category.Providers.Count.ToString(), countFont))
+                    {
+                        HorizontalAlignment = Element.ALIGN_CENTER,
+                        Padding = 8,
+                        BorderColor = BaseColor.LIGHT_GRAY
+                    };
+                    table.AddCell(providersCell);
+                }
+
+                document.Add(table);
+
+                // Add summary
+                Paragraph summary = new Paragraph($"Total Categories: {categories.Count}", iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 12))
+                {
+                    Alignment = Element.ALIGN_RIGHT,
+                    SpacingBefore = 20f
+                };
+                document.Add(summary);
+
+                document.Close();
+
+                return File(stream.ToArray(), "application/pdf", "ServiceCategories.pdf");
+            }
         }
     }
 }

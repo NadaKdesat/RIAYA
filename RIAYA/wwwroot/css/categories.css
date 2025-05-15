@@ -13,6 +13,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    width: 390px !important;
 }
 
     .category-card:hover {
@@ -100,6 +101,7 @@ h2, h5 {
     display: flex;
     flex-wrap: wrap;
     row-gap: 20px;
+    margin-bottom:50px;
 }
 
 .col-md-6, .col-lg-4 {
