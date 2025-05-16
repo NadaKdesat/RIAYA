@@ -330,5 +330,428 @@ namespace RIAYA.Controllers
                 return File(stream.ToArray(), "application/pdf", "ServiceCategories.pdf");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategory(int id)
+        {
+            try
+            {
+                var category = await _context.ServiceCategories.FindAsync(id);
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "Category not found" });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = category.Id,
+                        categoryName = category.CategoryName,
+                        categoryDescription = category.CategoryDescription
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(int id, string categoryName, string categoryDescription)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(categoryName))
+                {
+                    return Json(new { success = false, message = "Category name is required." });
+                }
+
+                var category = await _context.ServiceCategories.FindAsync(id);
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "Category not found" });
+                }
+
+                category.CategoryName = categoryName;
+                category.CategoryDescription = categoryDescription;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Category updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error updating category: " + ex.Message,
+                    inner = ex.InnerException?.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                var category = await _context.ServiceCategories
+                    .Include(c => c.Services)
+                    .Include(c => c.Providers)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "Category not found" });
+                }
+
+                // Soft delete the category
+                category.IsDeleted = true;
+
+                // Soft delete all related services
+                foreach (var service in category.Services)
+                {
+                    service.IsDeleted = true;
+                }
+
+                // Deactivate all related providers
+                foreach (var provider in category.Providers)
+                {
+                    provider.IsActive = false;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Category and related items have been hidden successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RestoreCategory(int id)
+        {
+            try
+            {
+                var category = await _context.ServiceCategories
+                    .Include(c => c.Services)
+                    .Include(c => c.Providers)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "Category not found" });
+                }
+
+                // Restore the category
+                category.IsDeleted = false;
+
+                // Restore all related services
+                foreach (var service in category.Services)
+                {
+                    service.IsDeleted = false;
+                }
+
+                // Reactivate all related providers
+                foreach (var provider in category.Providers)
+                {
+                    provider.IsActive = true;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Category and related items have been restored successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> DeletedCategories()
+        {
+            var categories = await _context.ServiceCategories
+                .Where(c => c.IsDeleted)
+                .Include(c => c.Services.Where(s => s.IsDeleted))
+                .Include(c => c.Providers.Where(p => !p.IsActive))
+                .ToListAsync();
+
+            return View(categories);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategoryProviders(int id)
+        {
+            try
+            {
+                var providers = await _context.Providers
+                    .Where(p => p.CategoryId == id)
+                    .Include(p => p.User)
+                    .Select(p => new
+                    {
+                        fullName = p.User.FullName,
+                        email = p.User.Email,
+                        phone = p.User.Phone,
+                        specialization = p.Specialization,
+                        yearsOfExperience = p.YearsOfExperience,
+                        city = p.User.City,
+                        isActive = p.IsActive
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, data = providers });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategoryServices(int id)
+        {
+            try
+            {
+                var services = await _context.Services
+                    .Where(s => s.CategoryId == id && !s.IsDeleted)
+                    .Select(s => new
+                    {
+                        id = s.Id,
+                        serviceType = s.ServiceType,
+                        serviceDescription = s.ServiceDescription,
+                        price = s.Price
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, data = services });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetService(int id)
+        {
+            try
+            {
+                var service = await _context.Services.FindAsync(id);
+                if (service == null)
+                {
+                    return Json(new { success = false, message = "Service not found" });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = service.Id,
+                        serviceType = service.ServiceType,
+                        serviceDescription = service.ServiceDescription,
+                        price = service.Price
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddService(string serviceType, string serviceDescription, decimal price, int categoryId)
+        {
+            try
+            {
+                // Validate inputs
+                if (string.IsNullOrWhiteSpace(serviceType))
+                {
+                    return Json(new { success = false, message = "Service type is required" });
+                }
+
+                if (price <= 0)
+                {
+                    return Json(new { success = false, message = "Price must be greater than 0" });
+                }
+
+                // Check if category exists
+                var category = await _context.ServiceCategories.FindAsync(categoryId);
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "Category not found" });
+                }
+
+                // Create new service
+                var service = new Service
+                {
+                    ServiceType = serviceType,
+                    ServiceDescription = serviceDescription,
+                    Price = price,
+                    CategoryId = categoryId,
+                    CreatedAt = DateTime.Now,
+                    IsDeleted = false
+                };
+
+                // Save to database
+                await _context.Services.AddAsync(service);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Service added successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateService(int id, string serviceType, string serviceDescription, decimal price)
+        {
+            try
+            {
+                // Find service
+                var service = await _context.Services.FindAsync(id);
+                if (service == null)
+                {
+                    return Json(new { success = false, message = "Service not found" });
+                }
+
+                // Validate inputs
+                if (string.IsNullOrWhiteSpace(serviceType))
+                {
+                    return Json(new { success = false, message = "Service type is required" });
+                }
+
+                if (price <= 0)
+                {
+                    return Json(new { success = false, message = "Price must be greater than 0" });
+                }
+
+                // Update service
+                service.ServiceType = serviceType;
+                service.ServiceDescription = serviceDescription;
+                service.Price = price;
+
+                // Save changes
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Service updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteService(int id)
+        {
+            try
+            {
+                Console.WriteLine($"Deleting service with ID: {id}");
+
+                // First check if service exists
+                var service = await _context.Services.FindAsync(id);
+                if (service == null)
+                {
+                    Console.WriteLine($"Service not found with ID: {id}");
+                    return Json(new { success = false, message = "Service not found" });
+                }
+
+                Console.WriteLine($"Found service: {service.ServiceType}, Current IsDeleted: {service.IsDeleted}");
+
+                // Use raw SQL to update
+                var sql = $"UPDATE Services SET IsDeleted = 1 WHERE Id = {id}";
+                var result = await _context.Database.ExecuteSqlRawAsync(sql);
+                Console.WriteLine($"SQL Update result: {result} rows affected");
+
+                // Verify the change
+                var updatedService = await _context.Services.FindAsync(id);
+                Console.WriteLine($"Updated service IsDeleted status: {updatedService.IsDeleted}");
+
+                return Json(new { success = true, message = "Service deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DeleteService: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHiddenServices(int categoryId)
+        {
+            try
+            {
+                Console.WriteLine($"Fetching hidden services for category {categoryId}");
+
+                // First, let's check all services in this category
+                var allServices = await _context.Services
+                    .Where(s => s.CategoryId == categoryId)
+                    .ToListAsync();
+
+                Console.WriteLine($"Total services in category {categoryId}: {allServices.Count}");
+                foreach (var service in allServices)
+                {
+                    Console.WriteLine($"Service ID: {service.Id}, Type: {service.ServiceType}, IsDeleted: {service.IsDeleted}");
+                }
+
+                // Now get only the deleted services using a simpler query
+                var services = await _context.Services
+                    .Where(s => s.CategoryId == categoryId && s.IsDeleted == true)
+                    .Select(s => new
+                    {
+                        id = s.Id,
+                        serviceType = s.ServiceType,
+                        serviceDescription = s.ServiceDescription,
+                        price = s.Price,
+                        isDeleted = s.IsDeleted
+                    })
+                    .ToListAsync();
+
+                Console.WriteLine($"Found {services.Count} hidden services");
+                foreach (var service in services)
+                {
+                    Console.WriteLine($"Hidden Service: {service.serviceType}, ID: {service.id}, IsDeleted: {service.isDeleted}");
+                }
+                return Json(new { success = true, count = services.Count, data = services });
+
+                //return Json(new { success = true, data = services });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetHiddenServices: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RestoreService(int id)
+        {
+            try
+            {
+                var service = await _context.Services.FindAsync(id);
+                if (service == null)
+                {
+                    return Json(new { success = false, message = "Service not found" });
+                }
+
+                service.IsDeleted = false;
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Service restored successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

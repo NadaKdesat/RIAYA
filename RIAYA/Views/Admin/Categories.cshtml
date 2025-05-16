@@ -5,15 +5,19 @@
 }
 
 @section Style {
+    <link href="~/css/categories.css" rel="stylesheet" asp-append-version="true" />
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css" rel="stylesheet" />
-    <link href="~/css/categories.css" rel="stylesheet" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
 }
 
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mt-4 fw-bold">Service Categories Management</h2>
         <div>
+            <a href="@Url.Action("DeletedCategories", "Admin")" class="btn btn-secondary me-2">
+                <i class="fas fa-trash"></i> View Deleted Categories
+            </a>
             <a href="@Url.Action("DownloadCategoriesPDF", "Admin")" class="btn btn-primary me-2">
                 <i class="fas fa-file-pdf"></i> Download PDF
             </a>
@@ -79,14 +83,14 @@
             </div>
             <div class="modal-body">
                 <form id="categoryForm" onsubmit="return saveCategory(event)">
-                    <input type="hidden" id="categoryId" />
+                    <input type="hidden" id="categoryId" name="categoryId" />
                     <div class="mb-3">
                         <label for="categoryName" class="form-label">Category Name</label>
                         <input type="text" class="form-control" id="categoryName" name="categoryName" required>
                     </div>
                     <div class="mb-3">
                         <label for="categoryDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="3"></textarea>
+                        <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="3" required></textarea>
                     </div>
                     <div id="alertContainer"></div>
                     <div class="modal-footer">
@@ -99,27 +103,33 @@
     </div>
 </div>
 
+
 <!-- Services Modal -->
-<div class="modal fade" id="servicesModal" tabindex="-1">
+<div class="modal fade" id="servicesModal" tabindex="-1" aria-labelledby="servicesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Category Services</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="servicesModalLabel">Category Services</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="d-flex justify-content-between mb-3">
                     <h6 id="servicesCategoryName"></h6>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="showAddServiceModal()">
-                        <i class="fas fa-plus"></i> Add Service
-                    </button>
+                    <div>
+                        <button type="button" class="btn btn-secondary btn-sm me-2" onclick="showHiddenServices()">
+                            <i class="fas fa-eye-slash"></i> Show Hidden Services
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="showAddServiceModal()">
+                            <i class="fas fa-plus"></i> Add Service
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="servicesTable">
                         <thead>
                             <tr>
-                                <th>Description</th>
                                 <th>Service Type</th>
+                                <th>Description</th>
                                 <th>Price</th>
                                 <th>Actions</th>
                             </tr>
@@ -132,56 +142,33 @@
     </div>
 </div>
 
-<!-- Providers Modal -->
-<div class="modal fade" id="providersModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Category Providers</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="providersTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="providersTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Add/Edit Service Modal -->
-<div class="modal fade" id="serviceModal" tabindex="-1">
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="serviceModalTitle">Add Service</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="serviceModalLabel">Add Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="serviceForm">
                     <input type="hidden" id="serviceId" />
                     <input type="hidden" id="serviceCategoryId" />
                     <div class="mb-3">
-                        <label class="form-label">Service Name</label>
-                        <input type="text" class="form-control" id="serviceName" required>
+                        <label for="serviceType" class="form-label">Service Type</label>
+                        <select class="form-select" id="serviceType" required>
+                            <option value="">Select Service Type</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="HomeCare">Home Care</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" id="serviceDescription" rows="3"></textarea>
+                        <label for="serviceDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="serviceDescription" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" id="servicePrice" required>
+                        <label for="servicePrice" class="form-label">Price</label>
+                        <input type="number" class="form-control" id="servicePrice" step="0.01" required>
                     </div>
                 </form>
             </div>
@@ -193,6 +180,37 @@
     </div>
 </div>
 
+<!-- Providers Modal -->
+<div class="modal fade" id="providersModal" tabindex="-1" aria-labelledby="providersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="providersModalLabel">Category Providers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="providersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Specialization</th>
+                                <th>Experience</th>
+                                <th>City</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="providersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
@@ -203,9 +221,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
     <script>
-        // Check for success message and close modal after 2 seconds
         $(document).ready(function() {
             if ($('.alert-success').length > 0) {
                 setTimeout(function() {
@@ -220,43 +238,33 @@
         function saveCategory(event) {
             event.preventDefault();
 
+            const categoryId = $('#categoryId').val();
             const categoryData = {
+                id: categoryId,
                 categoryName: $('#categoryName').val(),
                 categoryDescription: $('#categoryDescription').val()
             };
 
+            const url = categoryId ? '/Admin/UpdateCategory' : '/Admin/addCategory';
+
             $.ajax({
-                url: '/Admin/addCategory',
+                url: url,
                 type: 'POST',
                 data: categoryData,
                 success: function(response) {
-                    // Clear previous alerts
-                    $('#alertContainer').empty();
-
-                    // Add success message
-                    $('#alertContainer').html(`
-                        <div class="alert alert-success">
-                            Category added successfully!
-                        </div>
+                    $('#alertContainer').empty().html(`
+                        <div class="alert alert-success">Category ${categoryId ? 'updated' : 'added'} successfully!</div>
                     `);
 
-                    // Clear form
                     $('#categoryName').val('');
                     $('#categoryDescription').val('');
 
-                    // Refresh the page after 2 seconds
-                    setTimeout(function() {
-                        location.reload();
-                    }, 2000);
+                    setTimeout(() => location.reload(), 2000);
                 },
                 error: function(xhr) {
-                    // Clear previous alerts
-                    $('#alertContainer').empty();
-
-                    // Add error message
-                    $('#alertContainer').html(`
+                    $('#alertContainer').empty().html(`
                         <div class="alert alert-danger">
-                            Error adding category: ${xhr.responseText}
+                            Error ${categoryId ? 'updating' : 'adding'} category: ${xhr.responseText}
                         </div>
                     `);
                 }
@@ -274,6 +282,457 @@
             $('#alertContainer').empty();
             var categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
             categoryModal.show();
+        }
+
+        function editCategory(id) {
+            // Fetch category data
+            $.get(`/Admin/GetCategory/${id}`, function(response) {
+                if (response.success) {
+                    const category = response.data;
+                    $('#categoryModalTitle').text('Edit Category');
+                    $('#categoryId').val(category.id);
+                    $('#categoryName').val(category.categoryName);
+                    $('#categoryDescription').val(category.categoryDescription);
+                    $('#alertContainer').empty();
+                    var categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+                    categoryModal.show();
+                } else {
+                    alert('Error loading category data: ' + response.message);
+                }
+            });
+        }
+
+        function deleteCategory(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will hide the category and all its related services and providers!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#053D76',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, hide it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/Admin/DeleteCategory/${id}`, function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Hidden!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#053D76'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#053D76'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function viewProviders(categoryId) {
+            $.get(`/Admin/GetCategoryProviders/${categoryId}`, function(response) {
+                if (response.success) {
+                    const providers = response.data;
+                    const tbody = $('#providersTableBody');
+                    tbody.empty();
+
+                    providers.forEach(provider => {
+                        tbody.append(`
+                            <tr>
+                                <td>${provider.fullName}</td>
+                                <td>${provider.email}</td>
+                                <td>${provider.phone || 'N/A'}</td>
+                                <td>${provider.specialization || 'N/A'}</td>
+                                <td>${provider.yearsOfExperience || 'N/A'} years</td>
+                                <td>${provider.city || 'N/A'}</td>
+                                <td>
+                                    <span class="badge ${provider.isActive ? 'bg-success' : 'bg-danger'}">
+                                        ${provider.isActive ? 'Active' : 'Inactive'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                    var providersModal = new bootstrap.Modal(document.getElementById('providersModal'));
+                    providersModal.show();
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                }
+            });
+        }
+
+        // Store current category ID
+        let currentCategoryId = null;
+
+        // View services for a category
+        function viewServices(categoryId) {
+            currentCategoryId = categoryId;
+
+            $.get(`/Admin/GetCategoryServices/${categoryId}`, function(response) {
+                if (response.success) {
+                    const tbody = $('#servicesTableBody');
+                    tbody.empty();
+
+                    response.data.forEach(service => {
+                        tbody.append(`
+                            <tr>
+                                <td>${service.serviceType}</td>
+                                <td>${service.serviceDescription}</td>
+                                <td>$${service.price}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editService(${service.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${service.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                    // Reset the header and buttons
+                    $('#servicesTable thead tr').html(`
+                        <th>Service Type</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    `);
+
+                    $('.d-flex.justify-content-between.mb-3').html(`
+                        <h6 id="servicesCategoryName">Category Services</h6>
+                        <div>
+                            <button type="button" class="btn btn-secondary btn-sm me-2" onclick="showHiddenServices()">
+                                <i class="fas fa-eye-slash"></i> Show Hidden Services
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="showAddServiceModal()">
+                                <i class="fas fa-plus"></i> Add Service
+                            </button>
+                        </div>
+                    `);
+
+                    var servicesModal = new bootstrap.Modal(document.getElementById('servicesModal'));
+                    servicesModal.show();
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                }
+            });
+                    $('#servicesModal').on('hidden.bs.modal', function () {
+            location.reload(); // أو استخدم window.location.reload();
+        });
+        }
+
+        // Show add service modal
+        function showAddServiceModal() {
+            $('#serviceModalTitle').text('Add Service');
+            $('#serviceId').val('');
+            $('#serviceType').val('');
+            $('#serviceDescription').val('');
+            $('#servicePrice').val('');
+            $('#serviceCategoryId').val(currentCategoryId);
+
+            var serviceModal = new bootstrap.Modal(document.getElementById('serviceModal'));
+            serviceModal.show();
+        }
+
+        // Edit service
+        function editService(id) {
+            $.get(`/Admin/GetService/${id}`, function(response) {
+                if (response.success) {
+                    const service = response.data;
+                    $('#serviceModalTitle').text('Edit Service');
+                    $('#serviceId').val(service.id);
+                    $('#serviceType').val(service.serviceType).trigger('change');
+                    $('#serviceDescription').val(service.serviceDescription);
+                    $('#servicePrice').val(service.price);
+
+                    var serviceModal = new bootstrap.Modal(document.getElementById('serviceModal'));
+                    serviceModal.show();
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                }
+            });
+        }
+
+               // Save service (add or update)
+        function saveService() {
+            const serviceId = $('#serviceId').val();
+            const serviceType = $('#serviceType').val();
+            const serviceDescription = $('#serviceDescription').val();
+            const price = $('#servicePrice').val();
+            const categoryId = $('#serviceCategoryId').val();
+
+            // Validate inputs
+            if (!serviceType || !serviceDescription || !price) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please fill in all required fields.',
+                    icon: 'error',
+                    confirmButtonColor: '#053D76'
+                });
+                return;
+            }
+
+            let data = {};
+            let url = '';
+
+            if (serviceId) {
+                // Update existing service
+                url = '/Admin/UpdateService';
+                data = {
+                    id: parseInt(serviceId),
+                    serviceType: serviceType,
+                    serviceDescription: serviceDescription,
+                    price: parseFloat(price),
+                    categoryId: parseInt(categoryId)
+                };
+            } else {
+                // Add new service
+                if (!categoryId) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Category ID is missing.',
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                    return;
+                }
+                url = '/Admin/AddService';
+                data = {
+                    serviceType: serviceType,
+                    serviceDescription: serviceDescription,
+                    price: parseFloat(price),
+                    categoryId: parseInt(categoryId)
+                };
+            }
+
+            $.post(url, data, function(response) {
+                if (response.success) {
+                    // Close the service modal and remove backdrop
+                    var serviceModal = bootstrap.Modal.getInstance(document.getElementById('serviceModal'));
+                    serviceModal.hide();
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('overflow', '').css('padding-right', '');
+
+                    // Show success message
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonColor: '#053D76',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Reload the services list
+                        viewServices(currentCategoryId);
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                }
+            }).fail(function(xhr) {
+                console.error('Error:', xhr.responseText);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while saving the service. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#053D76'
+                });
+            });
+        }
+
+        // Delete service
+        function deleteService(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will hide the service from the list!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#053D76',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, hide it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/Admin/DeleteService/${id}`, function(response) {
+                        if (response.success) {
+                            // Remove backdrop and modal-open class
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open').css('overflow', '').css('padding-right', '');
+
+                            // Show success message
+                            Swal.fire({
+                                title: 'Hidden!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#053D76',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // Refresh the services list
+                                viewServices(currentCategoryId);
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#053D76'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Show hidden services
+        function showHiddenServices() {
+            if (!currentCategoryId) {
+                console.warn('currentCategoryId is null or undefined. Cannot fetch hidden services.');
+                return;
+            }
+
+            console.log('Showing hidden services for category:', currentCategoryId);
+
+        $.get(`/Admin/GetHiddenServices?categoryId=${currentCategoryId}`, function(response) {
+                console.log('Response:', response);
+
+                if (response.success) {
+                    const tbody = $('#servicesTableBody');
+                    tbody.empty();
+
+                    if (response.data.length === 0) {
+                        console.log('No hidden services found');
+                        tbody.append(`
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-info-circle mb-2" style="font-size: 24px;"></i>
+                                        <p class="mb-0">No hidden services found in this category</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    } else {
+                        console.log('Found hidden services:', response.data);
+                        response.data.forEach(service => {
+                            tbody.append(`
+                                <tr>
+                                    <td>${service.serviceType}</td>
+                                    <td>${service.serviceDescription}</td>
+                                    <td>$${service.price}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success" onclick="restoreService(${service.id})">
+                                            <i class="fas fa-undo"></i> Restore
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    // Update header and buttons
+                    $('#servicesTable thead tr').html(`
+                        <th>Service Type</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    `);
+
+                    $('.d-flex.justify-content-between.mb-3').html(`
+                        <h6 id="servicesCategoryName">Hidden Services</h6>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="viewServices(currentCategoryId)">
+                            <i class="fas fa-arrow-left"></i> Back to Active Services
+                        </button>
+                    `);
+                } else {
+                    console.error('Error:', response.message);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonColor: '#053D76'
+                    });
+                }
+            }).fail(function(xhr, status, error) {
+                console.error('AJAX Error:', {xhr, status, error});
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to load hidden services. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#053D76'
+                });
+            });
+        }
+
+        // Restore service
+        function restoreService(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to restore this service?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#053D76',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, restore it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/Admin/RestoreService/${id}`, function(response) {
+                        if (response.success) {
+                            // Remove backdrop and modal-open class
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open').css('overflow', '').css('padding-right', '');
+
+                            Swal.fire({
+                                title: 'Restored!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#053D76',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                showHiddenServices(); // Refresh the hidden services list
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#053D76'
+                            });
+                        }
+                    });
+                }
+            });
         }
     </script>
 }
