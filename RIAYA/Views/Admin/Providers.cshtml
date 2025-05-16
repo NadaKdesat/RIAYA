@@ -1,4 +1,675 @@
-﻿@{
+﻿@model IEnumerable<RIAYA.Models.Provider>
+@{
     ViewData["Title"] = "Providers";
     Layout = "_AdminLayout";
+}
+@section Style {
+    <link href="~/css/providers.css" rel="stylesheet" asp-append-version="true" />
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4 fw-bold">Healthcare Providers Management</h2>
+        <div>
+            <a href="@Url.Action("HiddenProviders", "Admin")" class="btn btn-secondary me-2">
+                <i class="fas fa-eye-slash"></i> View Hidden Providers
+            </a>
+            <a href="@Url.Action("DownloadProvidersPDF", "Admin")" class="btn btn-primary me-2">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+            <button type="button" class="btn btn-primary" onclick="showCreateProviderModal()">
+                <i class="fas fa-plus"></i> Add Provider
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Filters Section -->
+    <div class="filters-section mb-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="searchName" class="form-label fw-bold text-primary">Search by Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="searchName" placeholder="Enter provider name...">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="filterSpecialization" class="form-label fw-bold text-primary">Specialization</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-filter text-primary"></i>
+                        </span>
+                        <select class="form-control border-start-0" id="filterSpecialization">
+                            <option value="">All Specializations</option>
+                            @foreach (var spec in ViewBag.Specializations)
+                            {
+                                <option value="@spec">@spec</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Providers Grid -->
+    <div class="row g-4 mb-5">
+        @foreach (var provider in Model.Where(p => p.IsActive))
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="d-flex align-items-center">
+                            <img src="~/images/@provider.ProfileImage" class="provider-image me-3" alt="@provider.User?.FullName">
+                            <div>
+                                <h5 class="mb-0">@provider.User?.FullName</h5>
+                                <small class="text-muted">@provider.Specialization</small>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="showProviderDetails(@provider.Id)" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="showEditProviderModal(@provider.Id)" title="Edit Provider">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="toggleProviderStatus(@provider.Id)" title="Hide Provider">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="provider-body">
+                        <div class="provider-info">
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>@provider.User?.Email</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone"></i>
+                                <span>@provider.User?.Phone</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@provider.User?.City</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>@provider.YearsOfExperience years experience</span>
+                            </div>
+                        </div>
+                        <div class="provider-stats">
+                            <div class="stat-item">
+                                <div class="rating" data-provider-id="@provider.Id">
+                                    <i class="fas fa-star"></i>
+                                    <span class="rating-value">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span class="appointments-count" data-provider-id="@provider.Id">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Create Provider Modal -->
+<div class="modal fade" id="createProviderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Provider</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createProviderForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="fullName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gender</label>
+                            <select class="form-select" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Specialization</label>
+                            <input type="text" class="form-control" name="specialization" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" name="yearsOfExperience" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-control" name="categoryId" required>
+                                <option value="">Select Category</option>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <option value="@category.Id">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Profile Image</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" name="profileImage" accept="image/*" id="createProfileImage">
+                                <label class="input-group-text" for="createProfileImage">
+                                    <i class="fas fa-upload"></i>
+                                </label>
+                            </div>
+                            <div class="mt-2">
+                                <img id="createImagePreview" src="/images/default-avatar.png" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; display: none;">
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createProvider()">Create Provider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Provider Modal -->
+<div class="modal fade" id="editProviderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Provider</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProviderForm" method="post" action="/Admin/UpdateProvider" enctype="multipart/form-data">
+                    <input type="hidden" name="id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="fullName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gender</label>
+                            <select class="form-select" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Specialization</label>
+                            <input type="text" class="form-control" name="specialization" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" name="yearsOfExperience" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Profile Image</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" name="profileImage" accept="image/*" id="editProfileImage">
+                                <label class="input-group-text" for="editProfileImage">
+                                    <i class="fas fa-upload"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateProvider()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Provider Details Modal -->
+<div class="modal fade" id="providerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Provider Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4">
+                        <img id="detailProfileImage" src="" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <h4 id="detailFullName" class="text-primary"></h4>
+                        <p id="detailSpecialization" class="text-muted"></p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Email</label>
+                                <p id="detailEmail" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Phone</label>
+                                <p id="detailPhone" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">City</label>
+                                <p id="detailCity" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Gender</label>
+                                <p id="detailGender" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Experience</label>
+                                <p id="detailExperience" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Status</label>
+                                <p id="detailStatus" class="mb-0"></p>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-bold text-primary">Bio</label>
+                                <p id="detailBio" class="mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h5 class="text-primary mb-4">Statistics Overview</h5>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Average Rating</h6>
+                                        <div class="rating" id="detailRating"></div>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailRatingValue"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Total Appointments</h6>
+                                        <i class="fas fa-calendar-check text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailTotalAppointments"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="text-primary mb-4">Appointment Types</h5>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Home Care</h6>
+                                        <i class="fas fa-home text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailHomeCareAppointments"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Instant Care</h6>
+                                        <i class="fas fa-bolt text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailInstantHomeCareAppointments"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Electronic</h6>
+                                        <i class="fas fa-video text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailElectronicConsultations"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Load provider ratings and appointments
+            $('.rating').each(function () {
+                var providerId = $(this).data('provider-id');
+                loadProviderStats(providerId);
+            });
+
+            // Search and filter handlers
+            $('#searchName').on('keyup', function () {
+                var searchText = $(this).val().toLowerCase();
+                $('.provider-card').each(function () {
+                    var providerName = $(this).find('h5').text().toLowerCase();
+                    var specialization = $(this).find('small').text().toLowerCase();
+                    var specializationFilter = $('#filterSpecialization').val().toLowerCase();
+
+                    var nameMatch = providerName.includes(searchText);
+                    var specializationMatch = specializationFilter === '' || specialization.includes(specializationFilter);
+
+                    if (nameMatch && specializationMatch) {
+                        $(this).closest('.col-md-6').show();
+                    } else {
+                        $(this).closest('.col-md-6').hide();
+                    }
+                });
+            });
+
+            $('#filterSpecialization').on('change', function () {
+                var searchText = $('#searchName').val().toLowerCase();
+                var specializationFilter = $(this).val().toLowerCase();
+
+                $('.provider-card').each(function () {
+                    var providerName = $(this).find('h5').text().toLowerCase();
+                    var specialization = $(this).find('small').text().toLowerCase();
+
+                    var nameMatch = providerName.includes(searchText);
+                    var specializationMatch = specializationFilter === '' || specialization.includes(specializationFilter);
+
+                    if (nameMatch && specializationMatch) {
+                        $(this).closest('.col-md-6').show();
+                    } else {
+                        $(this).closest('.col-md-6').hide();
+                    }
+                });
+            });
+        });
+
+        function loadProviderStats(providerId) {
+            $.get(`/Admin/GetProviderDetails/${providerId}`, function (response) {
+                if (response.success) {
+                    var data = response.data;
+                    var rating = data.stats.averageRating;
+                    var totalAppointments = data.stats.totalAppointments;
+
+                    // Update rating
+                    var ratingElement = $(`.rating[data-provider-id="${providerId}"]`);
+                    ratingElement.find('.rating-value').text(rating.toFixed(1));
+                    ratingElement.find('.fa-star').each(function (index) {
+                        if (index < Math.floor(rating)) {
+                            $(this).addClass('text-warning');
+                        } else {
+                            $(this).removeClass('text-warning');
+                        }
+                    });
+
+                    // Update appointments count
+                    $(`.appointments-count[data-provider-id="${providerId}"]`).text(totalAppointments);
+                }
+            });
+        }
+
+        function showCreateProviderModal() {
+            $('#createProviderForm')[0].reset();
+            $('#createProviderModal').modal('show');
+        }
+
+        // Image preview for create form
+        $('#createProfileImage').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#createImagePreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function createProvider() {
+            var formData = new FormData($('#createProviderForm')[0]);
+
+            $.ajax({
+                url: '/Admin/CreateProvider',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message
+                        });
+                    }
+                }
+            });
+        }
+
+        function showEditProviderModal(id) {
+            $.get(`/Admin/GetProviderDetails/${id}`, function (response) {
+                if (response.success) {
+                    var provider = response.data.provider;
+                    var form = $('#editProviderForm');
+
+                    // Reset form first
+                    form[0].reset();
+
+                    // Set form values
+                    form.find('[name="id"]').val(id);
+                    form.find('[name="fullName"]').val(provider.fullName);
+                    form.find('[name="email"]').val(provider.email);
+                    form.find('[name="phone"]').val(provider.phone);
+                    form.find('[name="specialization"]').val(provider.specialization);
+                    form.find('[name="yearsOfExperience"]').val(provider.yearsOfExperience);
+                    form.find('[name="city"]').val(provider.city);
+                    form.find('[name="bio"]').val(provider.bio);
+
+                    // Set gender value
+                    var genderSelect = form.find('[name="gender"]');
+                    genderSelect.val(provider.gender);
+
+                    $('#editProviderModal').modal('show');
+                }
+            });
+        }
+
+        // Image preview for edit form
+        $('#editProfileImage').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create a new image preview element
+                    var previewDiv = $('<div class="mt-2"></div>');
+                    var previewImg = $('<img class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">');
+                    previewImg.attr('src', e.target.result);
+
+                    // Remove any existing preview
+                    $(this).closest('.col-md-6').find('.mt-2').remove();
+
+                    // Add the new preview
+                    previewDiv.append(previewImg);
+                    $(this).closest('.col-md-6').append(previewDiv);
+                }.bind(this);
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updateProvider() {
+            var formData = new FormData($('#editProviderForm')[0]);
+
+            $.ajax({
+                url: '/Admin/UpdateProvider',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message
+                        });
+                    }
+                }
+            });
+        }
+
+        function toggleProviderStatus(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will change the provider's status!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#053D76',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, change it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/Admin/ToggleProviderStatus/${id}`, function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function showProviderDetails(id) {
+            $.get(`/Admin/GetProviderDetails/${id}`, function (response) {
+                if (response.success) {
+                    var provider = response.data.provider;
+                    var stats = response.data.stats;
+
+                    // Update modal content
+                    var imageSrc = provider.profileImage
+                        ? `/images/${provider.profileImage}`
+                        : '/images/default-avatar.png';
+
+                    $('#detailProfileImage').attr('src', imageSrc);
+                    $('#detailFullName').text(provider.fullName);
+                    $('#detailSpecialization').text(provider.specialization);
+                    $('#detailEmail').text(provider.email);
+                    $('#detailPhone').text(provider.phone);
+                    $('#detailCity').text(provider.city);
+                    $('#detailGender').text(provider.gender);
+                    $('#detailExperience').text(provider.yearsOfExperience + ' years');
+                    $('#detailStatus').html(`<span class="badge ${provider.isActive ? 'bg-success' : 'bg-danger'}">${provider.isActive ? 'Active' : 'Hidden'}</span>`);
+                    $('#detailBio').text(provider.bio || 'No bio available');
+
+                    // Update statistics
+                    $('#detailRatingValue').text(stats.averageRating.toFixed(1));
+                    $('#detailTotalAppointments').text(stats.totalAppointments);
+                    $('#detailHomeCareAppointments').text(stats.homeCareAppointments);
+                    $('#detailInstantHomeCareAppointments').text(stats.instantHomeCareAppointments);
+                    $('#detailElectronicConsultations').text(stats.electronicConsultations);
+
+                    // Update rating stars
+                    var ratingHtml = '';
+                    for (var i = 1; i <= 5; i++) {
+                        ratingHtml += `<i class="fas fa-star ${i <= Math.floor(stats.averageRating) ? 'text-warning' : ''}"></i>`;
+                    }
+                    $('#detailRating').html(ratingHtml);
+
+                    $('#providerDetailsModal').modal('show');
+                }
+            });
+        }
+    </script>
 }

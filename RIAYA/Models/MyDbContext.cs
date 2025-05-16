@@ -266,7 +266,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<SessionRating>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SessionR__3214EC076F5A7B9D");
+            entity.HasKey(e => e.Id).HasName("PK__SessionR__3214EC0782C9EE5D");
 
             entity.Property(e => e.AppointmentType).HasMaxLength(20);
             entity.Property(e => e.CreatedAt)

@@ -753,5 +753,411 @@ namespace RIAYA.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        // Providers
+        public async Task<IActionResult> Providers()
+        {
+            try
+            {
+                // Get all providers with their user data
+                var providers = await _context.Providers
+                    .Include(p => p.User)
+                    .Include(p => p.Category)
+                    .ToListAsync();
+
+                // Get all specializations for filter
+                var specializations = providers
+                    .Where(p => !string.IsNullOrEmpty(p.Specialization))
+                    .Select(p => p.Specialization)
+                    .Distinct()
+                    .ToList();
+
+                // Get all categories for the create provider form
+                var categories = await _context.ServiceCategories
+                    .Where(c => !c.IsDeleted)
+                    .ToListAsync();
+
+                ViewBag.Specializations = specializations;
+                ViewBag.Categories = categories;
+
+                return View(providers);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading providers: {ex.Message}";
+                return View(new List<Provider>());
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetProviderDetails(int id)
+        {
+            try
+            {
+                var provider = _context.Providers
+                    .Include(p => p.User)
+                    .FirstOrDefault(p => p.Id == id);
+
+                if (provider == null)
+                {
+                    return Json(new { success = false, message = "Provider not found" });
+                }
+
+                // Get appointments
+                var homeCareAppointments = _context.HomeCareAppointments.Count(h => h.ProviderId == id);
+                var instantHomeCareAppointments = _context.InstantHomeCareAppointments.Count(i => i.ProviderId == id);
+                var electronicConsultations = _context.ElectronicConsultations.Count(e => e.ProviderId == id);
+                var totalAppointments = homeCareAppointments + instantHomeCareAppointments + electronicConsultations;
+
+                // Get ratings
+                var ratings = _context.SessionRatings
+                    .Where(sr => (sr.AppointmentType == "HomeCareAppointments" && _context.HomeCareAppointments.Any(h => h.Id == sr.AppointmentId && h.ProviderId == id)) ||
+                                (sr.AppointmentType == "InstantHomeCareAppointments" && _context.InstantHomeCareAppointments.Any(i => i.Id == sr.AppointmentId && i.ProviderId == id)) ||
+                                (sr.AppointmentType == "ElectronicConsultations" && _context.ElectronicConsultations.Any(e => e.Id == sr.AppointmentId && e.ProviderId == id)))
+                    .ToList();
+
+                var averageRating = ratings.Any() ? ratings.Average(r => r.Rating) : 0;
+
+                var stats = new
+                {
+                    averageRating = averageRating,
+                    totalAppointments = totalAppointments,
+                    homeCareAppointments = homeCareAppointments,
+                    instantHomeCareAppointments = instantHomeCareAppointments,
+                    electronicConsultations = electronicConsultations
+                };
+
+                // Ensure gender is not null and matches the select options
+                var gender = provider.User.Gender;
+                if (string.IsNullOrEmpty(gender))
+                {
+                    gender = "";
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        provider = new
+                        {
+                            id = provider.Id,
+                            fullName = provider.User.FullName,
+                            email = provider.User.Email,
+                            phone = provider.User.Phone,
+                            city = provider.User.City,
+                            gender = gender,
+                            specialization = provider.Specialization,
+                            yearsOfExperience = provider.YearsOfExperience,
+                            bio = provider.Bio,
+                            profileImage = provider.ProfileImage,
+                            isActive = provider.IsActive
+                        },
+                        stats = stats
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ToggleProviderStatus(int id)
+        {
+            try
+            {
+                var provider = _context.Providers.Find(id);
+                if (provider == null)
+                {
+                    return Json(new { success = false, message = "Provider not found" });
+                }
+
+                provider.IsActive = !provider.IsActive;
+                _context.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = provider.IsActive ? "Provider has been activated" : "Provider has been hidden"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult UpdateProvider(int id, string fullName, string email, string phone, string specialization,
+        int yearsOfExperience, string city, string gender, string bio, IFormFile profileImage)
+
+        {
+            try
+            {
+                var provider = _context.Providers
+                    .Include(p => p.User)
+                    .FirstOrDefault(p => p.Id == id);
+
+                if (provider == null)
+                {
+                    return Json(new { success = false, message = "Provider not found" });
+                }
+
+                provider.User.FullName = fullName;
+                provider.User.Email = email;
+                provider.User.Phone = phone;
+                provider.User.City = city;
+                provider.User.Gender = gender;
+                provider.Specialization = specialization;
+                provider.YearsOfExperience = yearsOfExperience;
+                provider.Bio = bio;
+                if (profileImage != null && profileImage.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(profileImage.FileName);
+                    var imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(imageDirectory))
+                    {
+                        Directory.CreateDirectory(imageDirectory);
+                    }
+
+                    var fullPath = Path.Combine(imageDirectory, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        profileImage.CopyTo(stream);
+                    }
+
+                    provider.ProfileImage = fileName;
+                }
+
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Provider information updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CreateProvider(string fullName, string email, string phone, string password,
+        string specialization, int yearsOfExperience, string city, string gender, int categoryId, string bio)
+        {
+            try
+            {
+                // التحقق من وجود البريد مسبقاً
+                if (_context.Users.Any(u => u.Email == email))
+                {
+                    return Json(new { success = false, message = "Email already exists" });
+                }
+
+                // قراءة الصورة من الفورم
+                var profileImage = Request.Form.Files["profileImage"];
+                string imagePath = null;
+
+                if (profileImage != null && profileImage.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(profileImage.FileName);
+                    var imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(imageDirectory))
+                    {
+                        Directory.CreateDirectory(imageDirectory);
+                    }
+
+                    var fullPath = Path.Combine(imageDirectory, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        profileImage.CopyTo(stream);
+                    }
+
+                    imagePath = fileName;
+                }
+
+                // إنشاء المستخدم
+                var user = new User
+                {
+                    FullName = fullName,
+                    Email = email,
+                    Phone = phone,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                    City = city,
+                    Gender = gender,
+                    UserType = "Provider"
+                };
+
+                _context.Users.Add(user);
+                _context.SaveChanges();
+
+                // إنشاء المزود
+                var provider = new Provider
+                {
+                    UserId = user.Id,
+                    Specialization = specialization,
+                    YearsOfExperience = yearsOfExperience,
+                    CategoryId = categoryId,
+                    Bio = bio,
+                    IsActive = true,
+                    LicenseUrl = "N/A",
+                    ProfileImage = imagePath
+                };
+
+                _context.Providers.Add(provider);
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Provider created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult DownloadProvidersPDF()
+        {
+            try
+            {
+                var providers = _context.Providers
+                    .Include(p => p.User)
+                    .Include(p => p.Category)
+                    .ToList();
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 25, 25, 30, 30))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+
+                        // Add title with custom styling
+                        var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, new BaseColor(5, 61, 118)); // Primary color
+                        var title = new Paragraph("Healthcare Providers Report", titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20f;
+                        document.Add(title);
+
+                        // Add date with custom styling
+                        var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, new BaseColor(108, 117, 125)); // Secondary color
+                        var date = new Paragraph($"Generated on: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}", dateFont);
+                        date.Alignment = Element.ALIGN_RIGHT;
+                        date.SpacingAfter = 20f;
+                        document.Add(date);
+
+                        // Create table with custom styling
+                        var table = new PdfPTable(6);
+                        table.WidthPercentage = 100;
+                        table.SetWidths(new float[] { 2, 2, 2, 2, 2, 2 });
+                        table.SpacingBefore = 20f;
+                        table.SpacingAfter = 20f;
+
+                        // Add headers with custom styling
+                        var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+                        var headerBackground = new BaseColor(5, 61, 118); // Primary color
+                        var headerCells = new[] { "Name", "Specialization", "Experience", "Rating", "Appointments", "Status" };
+
+                        foreach (var header in headerCells)
+                        {
+                            var cell = new PdfPCell(new Phrase(header, headerFont))
+                            {
+                                BackgroundColor = headerBackground,
+                                HorizontalAlignment = Element.ALIGN_CENTER,
+                                Padding = 8,
+                                BorderColor = BaseColor.WHITE
+                            };
+                            table.AddCell(cell);
+                        }
+
+                        // Add data with custom styling
+                        var dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                        var alternateRowColor = new BaseColor(230, 240, 255); // Light blue background
+
+                        for (int i = 0; i < providers.Count; i++)
+                        {
+                            var provider = providers[i];
+                            var rowColor = i % 2 == 0 ? BaseColor.WHITE : alternateRowColor;
+
+                            // Get appointments count
+                            var homeCareAppointments = _context.HomeCareAppointments.Count(h => h.ProviderId == provider.Id);
+                            var instantHomeCareAppointments = _context.InstantHomeCareAppointments.Count(i => i.ProviderId == provider.Id);
+                            var electronicConsultations = _context.ElectronicConsultations.Count(e => e.ProviderId == provider.Id);
+                            var totalAppointments = homeCareAppointments + instantHomeCareAppointments + electronicConsultations;
+
+                            // Get average rating
+                            var ratings = _context.SessionRatings
+                                .Where(sr => (sr.AppointmentType == "HomeCareAppointments" && _context.HomeCareAppointments.Any(h => h.Id == sr.AppointmentId && h.ProviderId == provider.Id)) ||
+                                            (sr.AppointmentType == "InstantHomeCareAppointments" && _context.InstantHomeCareAppointments.Any(i => i.Id == sr.AppointmentId && i.ProviderId == provider.Id)) ||
+                                            (sr.AppointmentType == "ElectronicConsultations" && _context.ElectronicConsultations.Any(e => e.Id == sr.AppointmentId && e.ProviderId == provider.Id)))
+                                .ToList();
+                            var averageRating = ratings.Any() ? ratings.Average(r => r.Rating) : 0;
+
+                            // Add cells with custom styling
+                            AddCell(table, provider.User.FullName, dataFont, rowColor);
+                            AddCell(table, provider.Specialization, dataFont, rowColor);
+                            AddCell(table, $"{provider.YearsOfExperience} years", dataFont, rowColor);
+                            AddCell(table, averageRating.ToString("F1"), dataFont, rowColor);
+                            AddCell(table, totalAppointments.ToString(), dataFont, rowColor);
+                            AddCell(table, provider.IsActive ? "Active" : "Hidden", dataFont, rowColor);
+                        }
+
+                        document.Add(table);
+
+                        // Add summary with custom styling
+                        var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(5, 61, 118));
+                        var summary = new Paragraph($"Total Providers: {providers.Count}", summaryFont);
+                        summary.Alignment = Element.ALIGN_RIGHT;
+                        summary.SpacingBefore = 20f;
+                        document.Add(summary);
+
+                        document.Close();
+                    }
+
+                    return File(ms.ToArray(), "application/pdf", "providers_report.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        private void AddCell(PdfPTable table, string text, Font font, BaseColor backgroundColor)
+        {
+            var cell = new PdfPCell(new Phrase(text, font))
+            {
+                BackgroundColor = backgroundColor,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                Padding = 8,
+                BorderColor = new BaseColor(230, 240, 255)
+            };
+            table.AddCell(cell);
+        }
+
+        [HttpGet]
+        public IActionResult HiddenProviders()
+        {
+            try
+            {
+                var providers = _context.Providers
+                    .Include(p => p.User)
+                    .Where(p => !p.IsActive)
+                    .ToList();
+
+                ViewBag.TotalProviders = providers.Count;
+                ViewBag.ActiveProviders = providers.Count(p => p.IsActive);
+                ViewBag.HiddenProviders = providers.Count(p => !p.IsActive);
+
+                return View(providers);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "An error occurred while loading providers: " + ex.Message;
+                return View(new List<Provider>());
+            }
+        }
     }
 }

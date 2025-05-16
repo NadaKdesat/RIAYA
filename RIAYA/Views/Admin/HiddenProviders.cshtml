@@ -1,0 +1,356 @@
+@model IEnumerable<RIAYA.Models.Provider>
+@{
+    ViewData["Title"] = "Hidden Providers";
+    Layout = "_AdminLayout";
+}
+@section Style {
+    <link href="~/css/providers.css" rel="stylesheet" asp-append-version="true" />
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4 fw-bold">Hidden Providers</h2>
+        <div>
+            <a href="@Url.Action("Providers", "Admin")" class="btn btn-primary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Active Providers
+            </a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Providers Grid -->
+    <div class="row">
+        @foreach (var provider in Model.Where(p => !p.IsActive))
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="d-flex align-items-center">
+                            <img src="~/images/@provider.ProfileImage" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div>
+                                <h5 class="mb-0">@provider.User?.FullName</h5>
+                                <small class="text-muted">@provider.Specialization</small>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="showProviderDetails(@provider.Id)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="restoreProvider(@provider.Id)">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="provider-body">
+                        <div class="provider-info">
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>@provider.User?.Email</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone"></i>
+                                <span>@provider.User?.Phone</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@provider.User?.City</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>@provider.YearsOfExperience years experience</span>
+                            </div>
+                        </div>
+                        <div class="provider-stats">
+                            <div class="stat-item">
+                                <div class="rating" data-provider-id="@provider.Id">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span class="rating-value">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span class="appointments-count" data-provider-id="@provider.Id">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<!-- Provider Details Modal -->
+<div class="modal fade" id="providerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Provider Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4">
+                        <img id="detailProfileImage" src="" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <h4 id="detailFullName" class="text-primary"></h4>
+                        <p id="detailSpecialization" class="text-muted"></p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Email</label>
+                                <p id="detailEmail" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Phone</label>
+                                <p id="detailPhone" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">City</label>
+                                <p id="detailCity" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Gender</label>
+                                <p id="detailGender" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Experience</label>
+                                <p id="detailExperience" class="mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-primary">Status</label>
+                                <p id="detailStatus" class="mb-0"></p>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-bold text-primary">Bio</label>
+                                <p id="detailBio" class="mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h5 class="text-primary mb-4">Statistics Overview</h5>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Average Rating</h6>
+                                        <div class="rating" id="detailRating"></div>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailRatingValue"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Total Appointments</h6>
+                                        <i class="fas fa-calendar-check text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailTotalAppointments"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="text-primary mb-4">Appointment Types</h5>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Home Care</h6>
+                                        <i class="fas fa-home text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailHomeCareAppointments"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Instant Care</h6>
+                                        <i class="fas fa-bolt text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailInstantHomeCareAppointments"></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card bg-light rounded-3 p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="text-muted mb-0">Electronic</h6>
+                                        <i class="fas fa-video text-primary"></i>
+                                    </div>
+                                    <h3 class="mb-0 text-primary" id="detailElectronicConsultations"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Load provider ratings and appointments
+            $('.rating').each(function () {
+                var providerId = $(this).data('provider-id');
+                loadProviderStats(providerId);
+            });
+        });
+
+        function loadProviderStats(providerId) {
+            $.get(`/Admin/GetProviderDetails/${providerId}`, function (response) {
+                if (response.success) {
+                    var data = response.data;
+                    var rating = data.stats.averageRating;
+                    var totalAppointments = data.stats.totalAppointments;
+
+                    // Update rating
+                    var ratingElement = $(`.rating[data-provider-id="${providerId}"]`);
+                    ratingElement.find('.rating-value').text(rating.toFixed(1));
+                    ratingElement.find('.fa-star').each(function (index) {
+                        if (index < Math.floor(rating)) {
+                            $(this).addClass('text-warning');
+                        } else {
+                            $(this).removeClass('text-warning');
+                        }
+                    });
+
+                    // Update appointments count
+                    $(`.appointments-count[data-provider-id="${providerId}"]`).text(totalAppointments);
+                }
+            });
+        }
+
+        function showProviderDetails(id) {
+            $.get(`/Admin/GetProviderDetails/${id}`, function (response) {
+                if (response.success) {
+                    var provider = response.data.provider;
+                    var stats = response.data.stats;
+
+                    // Update modal content
+                    var imageSrc = provider.profileImage
+                        ? `/images/${provider.profileImage}`
+                        : '/images/default-avatar.png';
+
+                    $('#detailProfileImage').attr('src', imageSrc);
+                    $('#detailFullName').text(provider.fullName);
+                    $('#detailSpecialization').text(provider.specialization);
+                    $('#detailEmail').text(provider.email);
+                    $('#detailPhone').text(provider.phone);
+                    $('#detailCity').text(provider.city);
+                    $('#detailGender').text(provider.gender);
+                    $('#detailExperience').text(provider.yearsOfExperience + ' years');
+                    $('#detailStatus').html(`<span class="badge ${provider.isActive ? 'bg-success' : 'bg-danger'}">${provider.isActive ? 'Active' : 'Hidden'}</span>`);
+                    $('#detailBio').text(provider.bio || 'No bio available');
+
+                    // Update statistics
+                    $('#detailRatingValue').text(stats.averageRating.toFixed(1));
+                    $('#detailTotalAppointments').text(stats.totalAppointments);
+                    $('#detailHomeCareAppointments').text(stats.homeCareAppointments);
+                    $('#detailInstantHomeCareAppointments').text(stats.instantHomeCareAppointments);
+                    $('#detailElectronicConsultations').text(stats.electronicConsultations);
+
+                    // Update rating stars
+                    var ratingHtml = '';
+                    for (var i = 1; i <= 5; i++) {
+                        ratingHtml += `<i class="fas fa-star ${i <= Math.floor(stats.averageRating) ? 'text-warning' : ''}"></i>`;
+                    }
+                    $('#detailRating').html(ratingHtml);
+
+                    $('#providerDetailsModal').modal('show');
+                }
+            });
+        }
+
+        function restoreProvider(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to restore this provider?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#053D76',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, restore it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/Admin/ToggleProviderStatus/${id}`, function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Restored!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#053D76',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#053D76'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function showProviderDetails(id) {
+            $.get(`/Admin/GetProviderDetails/${id}`, function (response) {
+                if (response.success) {
+                    var provider = response.data.provider;
+                    var stats = response.data.stats;
+
+                    // Update modal content
+                    var imageSrc = provider.profileImage
+                        ? `/images/${provider.profileImage}`
+                        : '/images/default-avatar.png';
+
+                    $('#detailProfileImage').attr('src', imageSrc);
+                    $('#detailFullName').text(provider.fullName);
+                    $('#detailSpecialization').text(provider.specialization);
+                    $('#detailEmail').text(provider.email);
+                    $('#detailPhone').text(provider.phone);
+                    $('#detailCity').text(provider.city);
+                    $('#detailGender').text(provider.gender);
+                    $('#detailExperience').text(provider.yearsOfExperience + ' years');
+                    $('#detailStatus').html(`<span class="badge ${provider.isActive ? 'bg-success' : 'bg-danger'}">${provider.isActive ? 'Active' : 'Hidden'}</span>`);
+                    $('#detailBio').text(provider.bio || 'No bio available');
+
+                    // Update statistics
+                    $('#detailRatingValue').text(stats.averageRating.toFixed(1));
+                    $('#detailTotalAppointments').text(stats.totalAppointments);
+                    $('#detailHomeCareAppointments').text(stats.homeCareAppointments);
+                    $('#detailInstantHomeCareAppointments').text(stats.instantHomeCareAppointments);
+                    $('#detailElectronicConsultations').text(stats.electronicConsultations);
+
+                    // Update rating stars
+                    var ratingHtml = '';
+                    for (var i = 1; i <= 5; i++) {
+                        ratingHtml += `<i class="fas fa-star ${i <= Math.floor(stats.averageRating) ? 'text-warning' : ''}"></i>`;
+                    }
+                    $('#detailRating').html(ratingHtml);
+
+                    $('#providerDetailsModal').modal('show');
+                }
+            });
+        }
+    </script>
+} 
