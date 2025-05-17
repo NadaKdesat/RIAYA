@@ -1,0 +1,173 @@
+﻿:root {
+    --primary-color: #053D76;
+    --secondary-color: #E6F0FF;
+    --white-color: #FFFFFF;
+}
+
+.nav-pills .nav-link {
+    color: #053D76;
+    border-radius: 20px;
+    padding: 8px 20px;
+    margin: 0 5px;
+}
+
+    .nav-pills .nav-link.active {
+        background-color: #053D76;
+        color: white;
+    }
+
+.reservation-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+    .reservation-card:hover {
+        transform: translateY(-5px);
+    }
+
+.reservation-header {
+    background-color: #E6F0FF;
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reservation-body {
+    padding: 20px;
+}
+
+.reservation-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    margin-bottom: 10px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #053D76;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    color: #666;
+}
+
+.status-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.status-confirmed {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.tab-content {
+    padding: 20px 0;
+}
+
+.no-reservations {
+    text-align: center;
+    padding: 50px;
+    background: #E6F0FF;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+    .no-reservations i {
+        font-size: 48px;
+        color: #053D76;
+        margin-bottom: 20px;
+    }
+
+.mt-4.fw-bold {
+    color: #053D76;
+    font-size: 1.75rem;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: var(--white-color);
+}
+
+    .table thead th {
+        background-color: var(--primary-color);
+        color: var(--white-color);
+        font-weight: 600;
+        padding: 12px;
+        border: none;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.3s ease;
+    }
+
+        .table tbody tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+    .table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+    .badge.bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000;
+    }
+
+.form-select, .form-control {
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+}
+
+    .form-select:focus, .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(5, 61, 118, 0.25);
+    }
+
+.fa-table:before
+Specificity: (0,1,1) {
+    content: "\f0ce";
+    color: #053D76 !important;
+}

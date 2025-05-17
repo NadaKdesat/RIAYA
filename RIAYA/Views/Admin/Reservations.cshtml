@@ -2,3 +2,169 @@
     ViewData["Title"] = "Reservations";
     Layout = "_AdminLayout";
 }
+
+@section Style {
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="~/css/reservations.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4 fw-bold">Reservations</h1>
+    <br />
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                All Reservations
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    <i class="fas fa-download me-1"></i> Download PDF
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <select id="reservationType" class="form-select" onchange="filterReservations()">
+                        <option value="all">All Types</option>
+                        <option value="Home Care">Home Care</option>
+                        <option value="Instant Home Care">Instant Home Care</option>
+                        <option value="Electronic Consultation">Electronic Consultation</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="categoryFilter" class="form-select" onchange="filterReservations()">
+                        <option value="">All Categories</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-select" onchange="filterReservations()">
+                        <option value="">All Status</option>
+                        <option value="true">Confirmed</option>
+                        <option value="false">Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by patient name..." onkeyup="filterReservations()">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="reservationsTable">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Type</th>
+                            <th>Patient Name</th>
+                            <th>Category</th>
+                            <th>Service</th>
+                            <th>Provider</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        let allReservations = [];
+
+        // Load reservations when page loads
+        $(document).ready(function() {
+            loadReservations();
+        });
+
+        function loadReservations() {
+            $.get('/Admin/GetAllReservations', function(response) {
+                if (response.success) {
+                    allReservations = response.data;
+                    filterReservations();
+                } else {
+                    alert('Error loading reservations: ' + response.message);
+                }
+            });
+        }
+
+        function filterReservations() {
+            const type = $('#reservationType').val();
+            const category = $('#categoryFilter').val();
+            const status = $('#statusFilter').val();
+            const search = $('#searchInput').val().toLowerCase();
+
+            let filtered = allReservations;
+
+            if (type !== 'all') {
+                filtered = filtered.filter(r => r.type === type);
+            }
+
+            if (category) {
+                filtered = filtered.filter(r => r.categoryName === category);
+            }
+
+            if (status !== '') {
+                filtered = filtered.filter(r => r.isConfirmed.toString() === status);
+            }
+
+            if (search) {
+                filtered = filtered.filter(r =>
+                    r.patientFullName.toLowerCase().includes(search)
+                );
+            }
+
+            displayReservations(filtered);
+        }
+
+        function displayReservations(reservations) {
+            const tbody = $('#reservationsTable tbody');
+            tbody.empty();
+
+            reservations.forEach(reservation => {
+                const row = `
+                    <tr>
+                        <td>${reservation.type}</td>
+                        <td>${reservation.patientFullName}</td>
+                        <td>${reservation.categoryName}</td>
+                        <td>${reservation.serviceName}</td>
+                        <td>${reservation.providerName || 'Not Assigned'}</td>
+                        <td>${reservation.contactPhone || 'N/A'}</td>
+                        <td>${reservation.appointmentDate}</td>
+                        <td>${reservation.appointmentTime}</td>
+                        <td>
+                            <span class="badge ${reservation.isConfirmed ? 'bg-success' : 'bg-warning'}">
+                                ${reservation.isConfirmed ? 'Confirmed' : 'Pending'}
+                            </span>
+                        </td>
+                        <td>
+                            ${reservation.type === 'Electronic Consultation'
+                                ? `<a href="${reservation.consultationLink}" target="_blank">Online</a>`
+                                : `${reservation.buildingName}, ${reservation.streetName}`
+                            }
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        function downloadPDF() {
+            window.location.href = '/Admin/DownloadReservationsPDF';
+        }
+    </script>
+}

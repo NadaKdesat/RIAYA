@@ -1752,5 +1752,431 @@ namespace RIAYA.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllReservations()
+        {
+            try
+            {
+                var homeCareAppointments = await _context.HomeCareAppointments
+                    .Include(h => h.Service)
+                    .Include(h => h.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(h => new ReservationViewModel
+                    {
+                        Id = h.Id,
+                        Type = "Home Care",
+                        PatientFullName = h.PatientFullName,
+                        CategoryName = h.CategoryName,
+                        ServiceName = h.ServiceName,
+                        ProviderName = h.Provider != null ? h.Provider.User.FullName : null,
+                        ContactPhone = h.ContactPhone,
+                        AppointmentDate = h.AppointmentDate.ToString("yyyy-MM-dd"),
+                        AppointmentTime = h.AppointmentTime.ToString("HH:mm"),
+                        IsConfirmed = h.IsConfirmed,
+                        LocationType = h.LocationType,
+                        BuildingName = h.BuildingName,
+                        StreetName = h.StreetName,
+                        ConsultationLink = null,
+                        CreatedAt = h.CreatedAt
+                    })
+                    .ToListAsync();
+
+                var instantHomeCareAppointmentsRaw = await _context.InstantHomeCareAppointments
+                    .Include(i => i.Service)
+                    .Include(i => i.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(i => new
+                    {
+                        i.Id,
+                        i.PatientFullName,
+                        i.CategoryName,
+                        i.ServiceName,
+                        ProviderName = i.Provider != null ? i.Provider.User.FullName : null,
+                        i.ContactPhone,
+                        CreatedAt = i.CreatedAt,  // خذ التاريخ كما هو بدون تحويل
+                        i.IsConfirmed,
+                        i.LocationType,
+                        i.BuildingName,
+                        i.StreetName,
+                    })
+                    .ToListAsync();
+
+                // بعد جلب البيانات، قم بتحويل التاريخ والوقت إلى نص
+                var instantHomeCareAppointments = instantHomeCareAppointmentsRaw
+                    .Select(i => new ReservationViewModel
+                    {
+                        Id = i.Id,
+                        Type = "Instant Home Care",
+                        PatientFullName = i.PatientFullName,
+                        CategoryName = i.CategoryName,
+                        ServiceName = i.ServiceName,
+                        ProviderName = i.ProviderName,
+                        ContactPhone = i.ContactPhone,
+                        AppointmentDate = i.CreatedAt?.ToString("yyyy-MM-dd"),
+                        AppointmentTime = i.CreatedAt?.ToString("HH:mm"),
+                        IsConfirmed = i.IsConfirmed,
+                        LocationType = i.LocationType,
+                        BuildingName = i.BuildingName,
+                        StreetName = i.StreetName,
+                        ConsultationLink = null,
+                        CreatedAt = i.CreatedAt
+                    })
+                    .ToList();
+
+                var electronicConsultations = await _context.ElectronicConsultations
+                    .Include(e => e.Service)
+                    .Include(e => e.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(e => new ReservationViewModel
+                    {
+                        Id = e.Id,
+                        Type = "Electronic Consultation",
+                        PatientFullName = e.PatientFullName,
+                        CategoryName = e.CategoryName,
+                        ServiceName = e.ServiceName,
+                        ProviderName = e.Provider != null ? e.Provider.User.FullName : null,
+                        ContactPhone = null,
+                        AppointmentDate = e.AppointmentDate.ToString("yyyy-MM-dd"),
+                        AppointmentTime = e.AppointmentTime.ToString("HH:mm"),
+                        IsConfirmed = e.IsConfirmed,
+                        LocationType = null,
+                        BuildingName = null,
+                        StreetName = null,
+                        ConsultationLink = e.ConsultationLink,
+                        CreatedAt = e.CreatedAt
+                    })
+                    .ToListAsync();
+
+                var allReservations = homeCareAppointments
+                    .Concat(instantHomeCareAppointments)
+                    .Concat(electronicConsultations)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToList();
+
+                return Json(new { success = true, data = allReservations });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHomeCareReservations()
+        {
+            try
+            {
+                var reservations = await _context.HomeCareAppointments
+                    .Include(h => h.Service)
+                    .Include(h => h.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(h => new
+                    {
+                        id = h.Id,
+                        patientFullName = h.PatientFullName,
+                        categoryName = h.CategoryName,
+                        serviceName = h.ServiceName,
+                        providerName = h.Provider != null ? h.Provider.User.FullName : null,
+                        contactPhone = h.ContactPhone,
+                        appointmentDate = h.AppointmentDate,
+                        appointmentTime = h.AppointmentTime,
+                        isConfirmed = h.IsConfirmed,
+                        locationType = h.LocationType,
+                        buildingName = h.BuildingName,
+                        streetName = h.StreetName,
+                        createdAt = h.CreatedAt
+                    })
+                    .OrderByDescending(r => r.createdAt)
+                    .ToListAsync();
+
+                return Json(new { success = true, data = reservations });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInstantHomeCareReservations()
+        {
+            try
+            {
+                var reservations = await _context.InstantHomeCareAppointments
+                    .Include(i => i.Service)
+                    .Include(i => i.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(i => new
+                    {
+                        id = i.Id,
+                        patientFullName = i.PatientFullName,
+                        categoryName = i.CategoryName,
+                        serviceName = i.ServiceName,
+                        providerName = i.Provider != null ? i.Provider.User.FullName : null,
+                        contactPhone = i.ContactPhone,
+                        appointmentDate = i.CreatedAt,
+                        appointmentTime = i.CreatedAt,
+                        isConfirmed = i.IsConfirmed,
+                        locationType = i.LocationType,
+                        buildingName = i.BuildingName,
+                        streetName = i.StreetName,
+                        createdAt = i.CreatedAt
+                    })
+                    .OrderByDescending(r => r.createdAt)
+                    .ToListAsync();
+
+                return Json(new { success = true, data = reservations });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetElectronicConsultations()
+        {
+            try
+            {
+                var consultations = await _context.ElectronicConsultations
+                    .Include(e => e.Service)
+                    .Include(e => e.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(e => new
+                    {
+                        id = e.Id,
+                        patientFullName = e.PatientFullName,
+                        categoryName = e.CategoryName,
+                        serviceName = e.ServiceName,
+                        providerName = e.Provider != null ? e.Provider.User.FullName : null,
+                        appointmentDate = e.AppointmentDate,
+                        appointmentTime = e.AppointmentTime,
+                        isConfirmed = e.IsConfirmed,
+                        consultationLink = e.ConsultationLink,
+                        createdAt = e.CreatedAt
+                    })
+                    .OrderByDescending(r => r.createdAt)
+                    .ToListAsync();
+
+                return Json(new { success = true, data = consultations });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Reservations
+        [HttpGet]
+        public IActionResult Reservations()
+        {
+            try
+            {
+                // Get all categories for filter
+                var categories = _context.ServiceCategories
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => c.CategoryName)
+                    .ToList();
+
+                ViewBag.Categories = categories;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading reservations: {ex.Message}";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadReservationsPDF()
+        {
+            try
+            {
+                // Get all reservations
+                var homeCareAppointments = await _context.HomeCareAppointments
+                    .Include(h => h.Service)
+                    .Include(h => h.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(h => new ReservationViewModel
+                    {
+                        Id = h.Id,
+                        Type = "Home Care",
+                        PatientFullName = h.PatientFullName,
+                        CategoryName = h.CategoryName,
+                        ServiceName = h.ServiceName,
+                        ProviderName = h.Provider != null ? h.Provider.User.FullName : null,
+                        ContactPhone = h.ContactPhone,
+                        AppointmentDate = h.AppointmentDate.ToString("yyyy-MM-dd"),
+                        AppointmentTime = h.AppointmentTime.ToString("HH:mm"),
+                        IsConfirmed = h.IsConfirmed,
+                        LocationType = h.LocationType,
+                        BuildingName = h.BuildingName,
+                        StreetName = h.StreetName,
+                        ConsultationLink = null,
+                        CreatedAt = h.CreatedAt
+                    })
+                    .ToListAsync();
+
+                var instantHomeCareAppointmentsRaw = await _context.InstantHomeCareAppointments
+                .Include(i => i.Service)
+                .Include(i => i.Provider)
+                .ThenInclude(p => p.User)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.PatientFullName,
+                    i.CategoryName,
+                    i.ServiceName,
+                    ProviderName = i.Provider != null ? i.Provider.User.FullName : null,
+                    i.ContactPhone,
+                    CreatedAt = i.CreatedAt,  // خذ التاريخ كما هو بدون تحويل
+                    i.IsConfirmed,
+                    i.LocationType,
+                    i.BuildingName,
+                    i.StreetName,
+                })
+                .ToListAsync();
+
+                // بعد جلب البيانات، قم بتحويل التاريخ والوقت إلى نص
+                var instantHomeCareAppointments = instantHomeCareAppointmentsRaw
+                    .Select(i => new ReservationViewModel
+                    {
+                        Id = i.Id,
+                        Type = "Instant Home Care",
+                        PatientFullName = i.PatientFullName,
+                        CategoryName = i.CategoryName,
+                        ServiceName = i.ServiceName,
+                        ProviderName = i.ProviderName,
+                        ContactPhone = i.ContactPhone,
+                        AppointmentDate = i.CreatedAt?.ToString("yyyy-MM-dd"),
+                        AppointmentTime = i.CreatedAt?.ToString("HH:mm"),
+                        IsConfirmed = i.IsConfirmed,
+                        LocationType = i.LocationType,
+                        BuildingName = i.BuildingName,
+                        StreetName = i.StreetName,
+                        ConsultationLink = null,
+                        CreatedAt = i.CreatedAt
+                    })
+                    .ToList();
+
+                var electronicConsultations = await _context.ElectronicConsultations
+                    .Include(e => e.Service)
+                    .Include(e => e.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(e => new ReservationViewModel
+                    {
+                        Id = e.Id,
+                        Type = "Electronic Consultation",
+                        PatientFullName = e.PatientFullName,
+                        CategoryName = e.CategoryName,
+                        ServiceName = e.ServiceName,
+                        ProviderName = e.Provider != null ? e.Provider.User.FullName : null,
+                        ContactPhone = null,
+                        AppointmentDate = e.AppointmentDate.ToString("yyyy-MM-dd"),
+                        AppointmentTime = e.AppointmentTime.ToString(),
+                        IsConfirmed = e.IsConfirmed,
+                        LocationType = null,
+                        BuildingName = null,
+                        StreetName = null,
+                        ConsultationLink = e.ConsultationLink,
+                        CreatedAt = e.CreatedAt
+                    })
+                    .ToListAsync();
+
+                var allReservations = homeCareAppointments
+                    .Concat(instantHomeCareAppointments)
+                    .Concat(electronicConsultations)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToList();
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 25, 25, 30, 30))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+
+                        // Add title with custom styling
+                        var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, new BaseColor(5, 61, 118)); // #053D76
+                        var title = new Paragraph("Reservations Report", titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20f;
+                        document.Add(title);
+
+                        // Add date with custom styling
+                        var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, new BaseColor(108, 117, 125));
+                        var date = new Paragraph($"Generated on: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}", dateFont);
+                        date.Alignment = Element.ALIGN_RIGHT;
+                        date.SpacingAfter = 20f;
+                        document.Add(date);
+
+                        // Create table with custom styling
+                        var table = new PdfPTable(8);
+                        table.WidthPercentage = 100;
+                        table.SetWidths(new float[] { 1, 2, 2, 2, 2, 2, 2, 2 });
+                        table.SpacingBefore = 20f;
+                        table.SpacingAfter = 20f;
+
+                        // Add headers with custom styling
+                        var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+                        var headerBackground = new BaseColor(5, 61, 118); // #053D76
+                        var headerCells = new[] { "Type", "Patient", "Category", "Service", "Provider", "Date/Time", "Status", "Location" };
+
+                        foreach (var header in headerCells)
+                        {
+                            var cell = new PdfPCell(new Phrase(header, headerFont))
+                            {
+                                BackgroundColor = headerBackground,
+                                HorizontalAlignment = Element.ALIGN_CENTER,
+                                Padding = 8,
+                                BorderColor = BaseColor.WHITE
+                            };
+                            table.AddCell(cell);
+                        }
+
+                        // Add data with custom styling
+                        var dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                        var alternateRowColor = new BaseColor(230, 240, 255); // #E6F0FF
+
+                        for (int i = 0; i < allReservations.Count; i++)
+                        {
+                            var reservation = allReservations[i];
+                            var rowColor = i % 2 == 0 ? BaseColor.WHITE : alternateRowColor;
+
+                            // Add cells with custom styling
+                            AddCell(table, reservation.Type, dataFont, rowColor);
+                            AddCell(table, reservation.PatientFullName, dataFont, rowColor);
+                            AddCell(table, reservation.CategoryName, dataFont, rowColor);
+                            AddCell(table, reservation.ServiceName, dataFont, rowColor);
+                            AddCell(table, reservation.ProviderName ?? "Not Assigned", dataFont, rowColor);
+                            AddCell(table, $"{reservation.AppointmentDate} {reservation.AppointmentTime}", dataFont, rowColor);
+                            AddCell(table, (reservation.IsConfirmed ?? false) ? "Confirmed" : "Pending", dataFont, rowColor);
+                            AddCell(table, reservation.Type == "Electronic Consultation"
+                                ? "Online"
+                                : $"{reservation.BuildingName}, {reservation.StreetName}", dataFont, rowColor);
+                        }
+
+                        document.Add(table);
+
+                        // Add summary with custom styling
+                        var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(5, 61, 118));
+                        var summary = new Paragraph($"Total Reservations: {allReservations.Count}", summaryFont);
+                        summary.Alignment = Element.ALIGN_RIGHT;
+                        summary.SpacingBefore = 20f;
+                        document.Add(summary);
+
+                        document.Close();
+                    }
+
+                    return File(ms.ToArray(), "application/pdf", "reservations_report.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
