@@ -1,0 +1,225 @@
+﻿@{
+    ViewData["Title"] = "Provider Dashboard";
+    Layout = "_ProviderLayout";
+}
+@section Style {
+    <link href="~/css/providerDashboard.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4 px-4">
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon blue">
+                    <i class="fas fa-calendar-check fa-lg"></i>
+                </div>
+                <div class="stats-value">@ViewBag.UpcomingAppointments</div>
+                <div class="stats-label">Upcoming Appointments</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon blue">
+                    <i class="fas fa-chart-line fa-lg"></i>
+                </div>
+                <div class="stats-value">@(ViewBag.TotalInstantAppointments + ViewBag.TotalHomeCareAppointments + ViewBag.TotalElectronicConsultations)</div>
+                <div class="stats-label">Total Appointments</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon green">
+                    <i class="fas fa-money-bill-wave fa-lg"></i>
+                </div>
+                <div class="stats-value">$@ViewBag.TotalEarnings.ToString("N2")</div>
+                <div class="stats-label">Total Earnings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon orange">
+                    <i class="fas fa-star fa-lg"></i>
+                </div>
+                <div class="stats-value">@ViewBag.AverageRating.ToString("N1")</div>
+                <div class="stats-label">Average Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Available Instant Appointments -->
+        <div class="col-md-6">
+            <div class="card available-appointments">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt text-warning me-2"></i>Available Instant Appointments</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.AvailableInstantAppointments?.Count > 0)
+                    {
+                        foreach (var appointment in ViewBag.AvailableInstantAppointments)
+                        {
+                            <div class="appointment-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="appointment-info">
+                                        <div><i class="fas fa-user"></i> @appointment.PatientFullName</div>
+                                        <div><i class="fas fa-clock"></i> @appointment.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+                                        <div><i class="fas fa-map-marker-alt"></i> @appointment.LocationType</div>
+                                    </div>
+                                    <button class="btn btn-primary accept-appointment" data-appointment-id="@appointment.Id">
+                                        Accept Request
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center p-4 text-muted">
+                            No available appointments at the moment
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability Schedule -->
+        <div class="col-md-6">
+            <div class="card availability-schedule">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock text-primary me-2"></i>Your Availability</h5>
+                </div>
+                <div class="card-body">
+                    <form id="availabilityForm">
+                        @{
+                            var days = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+                            var timeSlots = new[] { "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00" };
+                        }
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">@days[i]</label>
+                                <div class="d-flex flex-wrap">
+                                    @foreach (var time in timeSlots)
+                                    {
+                                        var availabilityList = ViewBag.Availability as List<ProviderAvailability> ?? new List<ProviderAvailability>();
+                                        var isSelected = availabilityList.Any(a => a.DayOfWeek == i &&
+                                        a.StartTime <= TimeOnly.Parse(time) &&
+                                        a.EndTime > TimeOnly.Parse(time));
+
+                                        <button type="button"
+                                                class="time-slot @(isSelected ? "selected" : "")"
+                                                data-day="@i"
+                                                data-time="@time">
+                                            @time
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <button type="submit" class="btn btn-primary mt-3">Save Availability</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Accept appointment
+            $('.accept-appointment').click(function() {
+                const button = $(this);
+                const appointmentId = button.data('appointment-id');
+
+                $.post('/Provider/AcceptInstantAppointment', { appointmentId: appointmentId })
+                    .done(function(response) {
+                        if (response.success) {
+                            button.closest('.appointment-item').fadeOut();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    })
+                    .fail(function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Failed to accept appointment'
+                        });
+                    });
+            });
+
+            // Time slot selection
+            $('.time-slot').click(function() {
+                $(this).toggleClass('selected');
+            });
+
+            // Save availability
+            $('#availabilityForm').submit(function(e) {
+                e.preventDefault();
+
+                const availability = [];
+                $('.time-slot.selected').each(function() {
+                    const day = $(this).data('day');
+                    const time = $(this).data('time');
+
+                    availability.push({
+                        dayOfWeek: day,
+                        startTime: time,
+                        endTime: addOneHour(time)
+                    });
+
+                    function addOneHour(timeStr) {
+                        const [hours, minutes] = timeStr.split(':').map(Number);
+                        const date = new Date();
+                        date.setHours(hours);
+                        date.setMinutes(minutes + 60);
+                        const h = String(date.getHours()).padStart(2, '0');
+                        const m = String(date.getMinutes()).padStart(2, '0');
+                        return `${h}:${m}`;
+                    }
+                });
+
+                $.ajax({
+                    url: '/Provider/UpdateAvailability',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(availability),
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Failed to update availability'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

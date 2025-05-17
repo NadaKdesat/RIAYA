@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RIAYA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
+    <link rel='stylesheet' href="~/css/scrllbar.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/providerLayout.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="~/images/Logo-removebg2.png" type="image/x-icon" asp-append-version="true">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2EG8zyN2QeW9JLRkFZJ9e+H0QnWYx0bsjzC4S+I=" crossorigin="" />
+    <!-- إضافة JavaScript الخاص بـ Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kPj4U5Z3YgD4h5kW9d4KwxQeASkgrHj6l+7U8=" crossorigin=""></script>
+
+    @await RenderSectionAsync("Style", required: false)
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <div>
+                    <button class="close-sidebar" type="button" data-bs-dismiss="sidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="~/images/logo2-removebg.png" alt="logo" class="logo" />
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ProviderDashboard" ? "active" : "")"
+                               asp-area="" asp-controller="Provider" asp-action="ProviderDashboard">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ProviderAppointments" ? "active" : "")"
+                               asp-area="" asp-controller="Provider" asp-action="ProviderAppointments">
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ProviderProfile" ? "active" : "")"
+                               asp-controller="Provider" asp-action="ProviderProfile">
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Logout" ? "active" : "")"
+                               asp-area="" asp-controller="User" asp-action="Logout">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+                <footer class="sidebar-footer">
+                    <p>RIAYA <br> All rights reserved</p>
+                </footer>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Content Area -->
+                <main class="content">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/navbar.js" asp-append-version="true"></script>
+    <script>
+        document.querySelector('.close-sidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.remove('show');
+        });
+            $(window).on('resize', function() {
+            if ($(window).width() >= 768) {
+                $('#sidebar').addClass('show');
+            } else {
+                $('#sidebar').removeClass('show');
+            }
+        });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o3Zm00B3as0xZaa9dGeL/5l5B1DN3ddZzDR3b8hSR78=" crossorigin=""></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

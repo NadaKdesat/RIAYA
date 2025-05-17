@@ -1,0 +1,199 @@
+body {
+    background-color: #F8FAFF;
+}
+
+.page-title {
+    color: #053D76;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+/* Statistics Cards */
+.stats-card {
+    background: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(5, 61, 118, 0.08);
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stats-icon.blue {
+    background-color: #E6F0FF;
+    color: #053D76;
+}
+
+.stats-icon.green {
+    background-color: #E8F5E9;
+    color: #4CAF50;
+}
+
+.stats-icon.orange {
+    background-color: #FFF3E0;
+    color: #FF9800;
+}
+
+.stats-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #053D76;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+/* Rating Stars */
+.rating-stars {
+    color: #FFC107;
+    font-size: 1.25rem;
+}
+
+.rating-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #053D76;
+}
+
+/* Available Appointments */
+.available-appointments {
+    background: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(5, 61, 118, 0.08);
+    margin-top: 2rem;
+}
+
+.available-appointments .card-header {
+    background-color: #E6F0FF;
+    border-radius: 15px 15px 0 0;
+    padding: 1.25rem;
+    border-bottom: none;
+}
+
+.available-appointments .card-header h5 {
+    color: #053D76;
+    font-weight: 600;
+    margin: 0;
+}
+
+.appointment-item {
+    padding: 1rem;
+    border-bottom: 1px solid #E6F0FF;
+    transition: background-color 0.3s ease;
+}
+
+.appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-item:hover {
+    background-color: #F8FAFF;
+}
+
+.appointment-info {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+.appointment-info i {
+    color: #053D76;
+    width: 20px;
+}
+
+/* Availability Schedule */
+.availability-schedule {
+    background: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(5, 61, 118, 0.08);
+    margin-top: 2rem;
+}
+
+.availability-schedule .card-header {
+    background-color: #E6F0FF;
+    border-radius: 15px 15px 0 0;
+    padding: 1.25rem;
+    border-bottom: none;
+}
+
+.availability-schedule .card-header h5 {
+    color: #053D76;
+    font-weight: 600;
+    margin: 0;
+}
+
+.time-slot {
+    background-color: #E6F0FF;
+    color: #053D76;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.time-slot:hover {
+    background-color: #053D76;
+    color: #FFFFFF;
+}
+
+.time-slot.selected {
+    background-color: #053D76;
+    color: #FFFFFF;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #053D76;
+    border-color: #053D76;
+}
+
+.btn-primary:hover {
+    background-color: #042c54;
+    border-color: #042c54;
+}
+
+.btn-success {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.btn-success:hover {
+    background-color: #43A047;
+    border-color: #43A047;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .stats-value {
+        font-size: 1.5rem;
+    }
+
+    .time-slot {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+} 

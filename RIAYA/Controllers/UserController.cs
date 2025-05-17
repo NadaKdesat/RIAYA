@@ -122,6 +122,25 @@ namespace RIAYA.Controllers
                             case "admin":
                                 return RedirectToAction("AdminDashboard", "Admin");
                             case "provider":
+                                var provider = _context.Providers.FirstOrDefault(p => p.UserId == user.Id);
+                                if (provider != null)
+                                {
+                                    HttpContext.Session.SetString("ProfileImage", provider.ProfileImage ?? "");
+                                    HttpContext.Session.SetString("Specialization", provider.Specialization ?? "");
+
+                                    if (rememberMe)
+                                    {
+                                        CookieOptions options = new CookieOptions
+                                        {
+                                            Expires = DateTime.Now.AddDays(7),
+                                            IsEssential = true,
+                                            HttpOnly = true,
+                                            Secure = true
+                                        };
+                                        Response.Cookies.Append("ProfileImage", provider.ProfileImage ?? "", options);
+                                        Response.Cookies.Append("Specialization", provider.Specialization ?? "", options);
+                                    }
+                                }
                                 return RedirectToAction("ProviderDashboard", "Provider");
                             case "user":
                                 return RedirectToAction("Index", "Home");

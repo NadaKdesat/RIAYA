@@ -1,0 +1,384 @@
+﻿@{
+    ViewData["Title"] = "Provider Appointments";
+    Layout = "_ProviderLayout";
+}
+@section Style {
+    <link href="~/css/providerAppointments.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="container-fluid py-4 px-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="page-title mb-4 fw-bold">My Appointments</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="appointment-toggle">
+                        <button class="toggle-btn active" data-target="upcoming">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Upcoming Appointments
+                        </button>
+                        <button class="toggle-btn" data-target="past">
+                            <i class="fas fa-history me-2"></i>
+                            Past Appointments
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Upcoming Appointments Section -->
+                    <div id="upcoming" class="appointment-section active">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Patient Name</th>
+                                        <th>Gender</th>
+                                        <th>Birth Date</th>
+                                        <th>Contact</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.UpcomingInstantAppointments?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.UpcomingInstantAppointments)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="instant">
+                                                <td><i class="fas fa-bolt text-warning"></i> Instant</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>
+                                                    <span class="appointment-status @(appointment.IsConfirmed == true ? "confirmed" : "pending")">
+                                                        @(appointment.IsConfirmed == true ? "Confirmed" : "Pending")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.UpcomingHomeCareAppointments?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.UpcomingHomeCareAppointments)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="homecare">
+                                                <td><i class="fas fa-home text-primary"></i> Home Care</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.AppointmentDate.ToString("dd/MM/yyyy") @appointment.AppointmentTime.ToString("HH:mm")</td>
+                                                <td>
+                                                    <span class="appointment-status @(appointment.IsConfirmed == true ? "confirmed" : "pending")">
+                                                        @(appointment.IsConfirmed == true ? "Confirmed" : "Pending")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.UpcomingElectronicConsultations?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.UpcomingElectronicConsultations)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="electronic">
+                                                <td><i class="fas fa-video text-info"></i> Electronic</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.AppointmentDate.ToString("dd/MM/yyyy") @appointment.AppointmentTime.ToString("HH:mm")</td>
+                                                <td>
+                                                    <span class="appointment-status @(appointment.IsConfirmed == true ? "confirmed" : "pending")">
+                                                        @(appointment.IsConfirmed == true ? "Confirmed" : "Pending")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(appointment.ConsultationLink))
+                                                    {
+                                                        <a href="@appointment.ConsultationLink" target="_blank" class="btn btn-sm btn-success">Join Meeting</a>
+                                                    }
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.UpcomingInstantAppointments?.Count == 0 &&
+                                    ViewBag.UpcomingHomeCareAppointments?.Count == 0 &&
+                                    ViewBag.UpcomingElectronicConsultations?.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="8" class="text-center">No upcoming appointments</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Past Appointments Section -->
+                    <div id="past" class="appointment-section">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Patient Name</th>
+                                        <th>Gender</th>
+                                        <th>Birth Date</th>
+                                        <th>Contact</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.PastInstantAppointments?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.PastInstantAppointments)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="instant">
+                                                <td><i class="fas fa-bolt text-warning"></i> Instant</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td><span class="appointment-status completed">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.PastHomeCareAppointments?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.PastHomeCareAppointments)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="homecare">
+                                                <td><i class="fas fa-home text-primary"></i> Home Care</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.AppointmentDate.ToString("dd/MM/yyyy") @appointment.AppointmentTime.ToString("HH:mm")</td>
+                                                <td><span class="appointment-status completed">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.PastElectronicConsultations?.Count > 0)
+                                    {
+                                        foreach (var appointment in ViewBag.PastElectronicConsultations)
+                                        {
+                                            <tr data-appointment-id="@appointment.Id" data-appointment-type="electronic">
+                                                <td><i class="fas fa-video text-info"></i> Electronic</td>
+                                                <td>@appointment.PatientFullName</td>
+                                                <td>@appointment.PatientGender</td>
+                                                <td>@appointment.PatientBirthDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@appointment.ContactPhone</td>
+                                                <td>@appointment.AppointmentDate.ToString("dd/MM/yyyy") @appointment.AppointmentTime.ToString("HH:mm")</td>
+                                                <td><span class="appointment-status completed">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary view-details"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#appointmentDetailsModal"
+                                                            data-appointment='@Json.Serialize(appointment)'>
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (ViewBag.PastInstantAppointments?.Count == 0 &&
+                                    ViewBag.PastHomeCareAppointments?.Count == 0 &&
+                                    ViewBag.PastElectronicConsultations?.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="8" class="text-center">No past appointments</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Details Modal -->
+<div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Appointment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="appointment-details-container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="detail-title">Patient Information</h6>
+                            <div class="detail-item">
+                                <i class="fas fa-user text-primary"></i>
+                                <span id="patientName"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-venus-mars text-primary"></i>
+                                <span id="patientGender"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake text-primary"></i>
+                                <span id="patientBirthDate"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-phone text-primary"></i>
+                                <span id="contactPhone"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="detail-title">Appointment Information</h6>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar text-primary"></i>
+                                <span id="appointmentDate"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock text-primary"></i>
+                                <span id="appointmentTime"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                                <span id="location"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-info-circle text-primary"></i>
+                                <span id="appointmentStatus"></span>
+                            </div>
+                            <div class="detail-item" id="consultationLinkContainer" style="display: none;">
+                                <i class="fas fa-video text-primary"></i>
+                                <a href="#" target="_blank" class="btn btn-sm btn-success" id="consultationLink">Join Meeting</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3" id="notesContainer" style="display: none;">
+                        <div class="col-12">
+                            <h6 class="detail-title">Notes</h6>
+                            <p class="notes" id="appointmentNotes"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Toggle between upcoming and past appointments
+            $('.toggle-btn').click(function() {
+                $('.toggle-btn').removeClass('active');
+                $(this).addClass('active');
+
+                const target = $(this).data('target');
+                $('.appointment-section').removeClass('active');
+                $(`#${target}`).addClass('active');
+            });
+
+            // View appointment details
+            $('.view-details').click(function() {
+                const appointment = $(this).data('appointment');
+                const type = $(this).closest('tr').data('appointment-type');
+
+                // Update modal content
+                $('#patientName').text(appointment.patientFullName);
+                $('#patientGender').text(appointment.patientGender);
+                $('#patientBirthDate').text(appointment.patientBirthDate);
+                $('#contactPhone').text(appointment.contactPhone);
+
+                if (type === 'instant') {
+                    $('#appointmentDate').text(appointment.createdAt.split('T')[0]);
+                    $('#appointmentTime').text(appointment.createdAt.split('T')[1].substring(0, 5));
+                    $('#location').text(appointment.serviceName || 'Instant Home Care');
+                    $('#consultationLinkContainer').hide();
+                } else if (type === 'homecare') {
+                    $('#appointmentDate').text(appointment.appointmentDate);
+                    $('#appointmentTime').text(appointment.appointmentTime);
+                    $('#location').text(appointment.serviceName || 'Home Care Service');
+                    $('#consultationLinkContainer').hide();
+                } else if (type === 'electronic') {
+                    $('#appointmentDate').text(appointment.appointmentDate);
+                    $('#appointmentTime').text(appointment.appointmentTime);
+                    $('#location').text(appointment.serviceName || 'Electronic Consultation');
+                    if (appointment.consultationLink) {
+                        $('#consultationLink').attr('href', appointment.consultationLink);
+                        $('#consultationLinkContainer').show();
+                    } else {
+                        $('#consultationLinkContainer').hide();
+                    }
+                }
+
+                // Update status
+                const statusClass = appointment.isConfirmed ? 'confirmed' : 'pending';
+                const statusText = appointment.isConfirmed ? 'Confirmed' : 'Pending';
+                $('#appointmentStatus').html(`<span class="appointment-status ${statusClass}">${statusText}</span>`);
+
+                // Update notes if available
+                if (appointment.notes) {
+                    $('#appointmentNotes').text(appointment.notes);
+                    $('#notesContainer').show();
+                } else {
+                    $('#notesContainer').hide();
+                }
+            });
+        });
+    </script>
+}
