@@ -209,7 +209,7 @@ td {
     }
 
     .summary-card .value {
-        color: var(--text-dark);
+        color: var(--primary-color);
         font-size: 1.8rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
@@ -236,7 +236,7 @@ td {
 }
 
     .chart-container h5 {
-        color: var(--text-dark);
+        color: var(--primary-color);
         font-weight: 600;
         margin-bottom: 1.5rem;
         padding-bottom: 0.5rem;
