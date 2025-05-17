@@ -62,7 +62,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Contact>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Contact__3214EC071C485DD6");
+            entity.HasKey(e => e.Id).HasName("PK__Contact__3214EC073BCA5A4F");
 
             entity.ToTable("Contact");
 
@@ -71,6 +71,9 @@ public partial class MyDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.IsRead).HasDefaultValue(false);
+            entity.Property(e => e.IsReplied).HasDefaultValue(false);
+            entity.Property(e => e.RepliedAt).HasColumnType("datetime");
             entity.Property(e => e.Subject).HasMaxLength(255);
         });
 

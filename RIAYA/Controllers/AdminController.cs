@@ -7,6 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using System.Net.Mail;
+using System.Net;
+using System.Text.Json;
 
 namespace RIAYA.Controllers
 {
@@ -1157,6 +1160,596 @@ namespace RIAYA.Controllers
             {
                 ViewBag.ErrorMessage = "An error occurred while loading providers: " + ex.Message;
                 return View(new List<Provider>());
+            }
+        }
+
+        //Users
+        public async Task<IActionResult> Users()
+        {
+            try
+            {
+                var users = await _context.Users
+                    .Where(u => u.UserType == "user")
+                    .OrderByDescending(u => u.CreatedAt)
+                    .ToListAsync();
+
+                return View(users);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading users: {ex.Message}";
+                return View(new List<User>());
+            }
+        }
+
+        [HttpGet("api/appointments/user/{userId}")]
+        public async Task<IActionResult> GetUserBookings(int userId)
+        {
+            try
+            {
+                Console.WriteLine($"Fetching bookings for user ID: {userId}");
+
+                // Get Home Care Appointments
+                var homeCareAppointments = await _context.HomeCareAppointments
+                    .Where(h => h.PatientId == userId)
+                    .Include(h => h.Service)
+                    .Include(h => h.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(h => new AppointmentViewModel
+                    {
+                        BookingType = "Home Care",
+                        PatientFullName = h.PatientFullName,
+                        PatientGender = h.PatientGender,
+                        PatientBirthDate = h.PatientBirthDate,
+                        CategoryName = h.CategoryName,
+                        ProviderName = h.Provider != null && h.Provider.User != null ? h.Provider.User.FullName : "N/A",
+                        AppointmentDateTime = h.AppointmentDate.ToDateTime(h.AppointmentTime),
+                        Status = h.IsConfirmed == true ? "Confirmed" : "Pending",
+                        Location = $"{h.BuildingName}, {h.StreetName}"
+                    }).ToListAsync();
+
+                Console.WriteLine($"Found {homeCareAppointments.Count} home care appointments");
+
+                // Get Instant Home Care Appointments
+                var instantHomeCareAppointments = await _context.InstantHomeCareAppointments
+                    .Where(i => i.PatientId == userId)
+                    .Include(i => i.Service)
+                    .Include(i => i.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(i => new AppointmentViewModel
+                    {
+                        BookingType = "Instant Home Care",
+                        PatientFullName = i.PatientFullName,
+                        PatientGender = i.PatientGender,
+                        PatientBirthDate = i.PatientBirthDate,
+                        CategoryName = i.CategoryName,
+                        ProviderName = i.Provider != null && i.Provider.User != null ? i.Provider.User.FullName : "N/A",
+                        AppointmentDateTime = i.CreatedAt ?? DateTime.Now,
+                        Status = i.IsConfirmed == true ? "Confirmed" : "Pending",
+                        Location = $"{i.BuildingName}, {i.StreetName}"
+                    }).ToListAsync();
+
+                Console.WriteLine($"Found {instantHomeCareAppointments.Count} instant home care appointments");
+
+                // Get Electronic Consultations
+                var electronicConsultations = await _context.ElectronicConsultations
+                    .Where(e => e.PatientId == userId)
+                    .Include(e => e.Service)
+                    .Include(e => e.Provider)
+                    .ThenInclude(p => p.User)
+                    .Select(e => new AppointmentViewModel
+                    {
+                        BookingType = "Electronic Consultation",
+                        PatientFullName = e.PatientFullName,
+                        PatientGender = e.PatientGender,
+                        PatientBirthDate = e.PatientBirthDate,
+                        CategoryName = e.CategoryName,
+                        ProviderName = e.Provider != null && e.Provider.User != null ? e.Provider.User.FullName : "N/A",
+                        AppointmentDateTime = e.AppointmentDate.ToDateTime(e.AppointmentTime),
+                        Status = e.IsConfirmed == true ? "Confirmed" : "Pending",
+                        Location = "Online",
+                        ConsultationLink = e.ConsultationLink
+                    }).ToListAsync();
+
+                Console.WriteLine($"Found {electronicConsultations.Count} electronic consultations");
+
+                // Combine all appointments
+                var allAppointments = homeCareAppointments
+                    .Concat(instantHomeCareAppointments)
+                    .Concat(electronicConsultations)
+                    .OrderByDescending(a => a.AppointmentDateTime)
+                    .ToList();
+
+                Console.WriteLine($"Total appointments: {allAppointments.Count}");
+
+                // Log the appointments for debugging
+                foreach (var appointment in allAppointments)
+                {
+                    Console.WriteLine($"Appointment: {appointment.BookingType} - {appointment.PatientFullName} - {appointment.AppointmentDateTime}");
+                }
+
+                return Json(new { success = true, data = allAppointments });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetUserBookings: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        public IActionResult DownloadUsersPDF()
+        {
+            try
+            {
+                var users = _context.Users
+                    .Where(u => u.UserType == "user")
+                    .OrderByDescending(u => u.CreatedAt)
+                    .ToList();
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 25, 25, 30, 30))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+
+                        // Add title with custom styling
+                        var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, new BaseColor(5, 61, 118)); // Primary color
+                        var title = new Paragraph("Users Report", titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20f;
+                        document.Add(title);
+
+                        // Add date with custom styling
+                        var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, new BaseColor(108, 117, 125)); // Secondary color
+                        var date = new Paragraph($"Generated on: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}", dateFont);
+                        date.Alignment = Element.ALIGN_RIGHT;
+                        date.SpacingAfter = 20f;
+                        document.Add(date);
+
+                        // Create table with custom styling
+                        var table = new PdfPTable(6);
+                        table.WidthPercentage = 100;
+                        table.SetWidths(new float[] { 2, 2, 2, 2, 2, 2 });
+                        table.SpacingBefore = 20f;
+                        table.SpacingAfter = 20f;
+
+                        // Add headers with custom styling
+                        var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+                        var headerBackground = new BaseColor(5, 61, 118); // Primary color
+                        var headerCells = new[] { "Name", "Email", "Phone", "City", "Gender", "Joined Date" };
+
+                        foreach (var header in headerCells)
+                        {
+                            var cell = new PdfPCell(new Phrase(header, headerFont))
+                            {
+                                BackgroundColor = headerBackground,
+                                HorizontalAlignment = Element.ALIGN_CENTER,
+                                Padding = 8,
+                                BorderColor = BaseColor.WHITE
+                            };
+                            table.AddCell(cell);
+                        }
+
+                        // Add data with custom styling
+                        var dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                        var alternateRowColor = new BaseColor(230, 240, 255); // Light blue background
+
+                        for (int i = 0; i < users.Count; i++)
+                        {
+                            var user = users[i];
+                            var rowColor = i % 2 == 0 ? BaseColor.WHITE : alternateRowColor;
+
+                            // Add cells with custom styling
+                            AddCell(table, user.FullName, dataFont, rowColor);
+                            AddCell(table, user.Email, dataFont, rowColor);
+                            AddCell(table, user.Phone, dataFont, rowColor);
+                            AddCell(table, user.City, dataFont, rowColor);
+                            AddCell(table, user.Gender, dataFont, rowColor);
+                            AddCell(table, user.CreatedAt?.ToString("MMM dd, yyyy"), dataFont, rowColor);
+                        }
+
+                        document.Add(table);
+
+                        // Add summary with custom styling
+                        var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(5, 61, 118));
+                        var summary = new Paragraph($"Total Users: {users.Count}", summaryFont);
+                        summary.Alignment = Element.ALIGN_RIGHT;
+                        summary.SpacingBefore = 20f;
+                        document.Add(summary);
+
+                        document.Close();
+                    }
+
+                    return File(ms.ToArray(), "application/pdf", "users_report.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Contact Us
+        public async Task<IActionResult> ContactUs()
+        {
+            try
+            {
+                var contacts = await _context.Contacts
+                    .OrderByDescending(c => c.CreatedAt)
+                    .ToListAsync();
+
+                return View(contacts);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading messages: {ex.Message}";
+                return View(new List<Contact>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContactMessage(int id)
+        {
+            try
+            {
+                var contact = await _context.Contacts.FindAsync(id);
+                if (contact == null)
+                {
+                    return Json(new { success = false, message = "Message not found" });
+                }
+
+                // Mark as read if not already
+                if (contact.IsRead == false)
+                {
+                    contact.IsRead = true;
+                    await _context.SaveChangesAsync();
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        fullName = contact.FullName,
+                        email = contact.Email,
+                        subject = contact.Subject,
+                        message = contact.Message,
+                        createdAt = contact.CreatedAt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendReply(int contactId, string subject, string message)
+        {
+            try
+            {
+                var contact = await _context.Contacts.FindAsync(contactId);
+                if (contact == null)
+                {
+                    return Json(new { success = false, message = "Message not found" });
+                }
+
+                // إرسال البريد الإلكتروني
+                var emailService = new EmailService();
+                await emailService.SendEmailAsync(contact.Email, subject, message);
+
+                // تحديث حالة الرسالة في قاعدة البيانات
+                contact.IsRead = true;
+                contact.IsReplied = true;
+                contact.RepliedAt = DateTime.Now;
+                contact.ReplyMessage = message;
+                _context.Update(contact);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Reply sent successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
+
+        public class EmailService
+        {
+            public async Task SendEmailAsync(string toEmail, string subject, string messageBody)
+            {
+                var smtpClient = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential("nadaqdesat@gmail.com", "aibl avfx vyag dxgn"),
+                    EnableSsl = true
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress("nadaqdesat@gmail.com", "RIAYA Admin"),
+                    Subject = subject,
+                    Body = messageBody,
+                    IsBodyHtml = false
+                };
+                mailMessage.To.Add(toEmail);
+
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+        }
+
+        public async Task<IActionResult> DownloadContactsPDF()
+        {
+            try
+            {
+                var contacts = await _context.Contacts
+                    .OrderByDescending(c => c.CreatedAt)
+                    .ToListAsync();
+
+                using (var ms = new MemoryStream())
+                {
+                    using (var document = new Document(PageSize.A4, 25, 25, 30, 30))
+                    {
+                        PdfWriter.GetInstance(document, ms);
+                        document.Open();
+
+                        // Add title with custom styling
+                        var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, new BaseColor(5, 61, 118));
+                        var title = new Paragraph("Contact Messages Report", titleFont);
+                        title.Alignment = Element.ALIGN_CENTER;
+                        title.SpacingAfter = 20f;
+                        document.Add(title);
+
+                        // Add date with custom styling
+                        var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, new BaseColor(108, 117, 125));
+                        var date = new Paragraph($"Generated on: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}", dateFont);
+                        date.Alignment = Element.ALIGN_RIGHT;
+                        date.SpacingAfter = 20f;
+                        document.Add(date);
+
+                        // Create table with custom styling
+                        var table = new PdfPTable(6);
+                        table.WidthPercentage = 100;
+                        table.SetWidths(new float[] { 2, 2, 2, 3, 2, 2 });
+                        table.SpacingBefore = 20f;
+                        table.SpacingAfter = 20f;
+
+                        // Add headers with custom styling
+                        var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+                        var headerBackground = new BaseColor(5, 61, 118);
+                        var headerCells = new[] { "Name", "Email", "Subject", "Message", "Date", "Status" };
+
+                        foreach (var header in headerCells)
+                        {
+                            var cell = new PdfPCell(new Phrase(header, headerFont))
+                            {
+                                BackgroundColor = headerBackground,
+                                HorizontalAlignment = Element.ALIGN_CENTER,
+                                Padding = 8,
+                                BorderColor = BaseColor.WHITE
+                            };
+                            table.AddCell(cell);
+                        }
+
+                        // Add data with custom styling
+                        var dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                        var alternateRowColor = new BaseColor(230, 240, 255);
+
+                        for (int i = 0; i < contacts.Count; i++)
+                        {
+                            var contact = contacts[i];
+                            var rowColor = i % 2 == 0 ? BaseColor.WHITE : alternateRowColor;
+
+                            // Add cells with custom styling
+                            AddCell(table, contact.FullName, dataFont, rowColor);
+                            AddCell(table, contact.Email, dataFont, rowColor);
+                            AddCell(table, contact.Subject, dataFont, rowColor);
+                            AddCell(table, contact.Message?.Length > 100 ? contact.Message.Substring(0, 100) + "..." : contact.Message, dataFont, rowColor);
+                            AddCell(table, contact.CreatedAt?.ToString("MMM dd, yyyy"), dataFont, rowColor);
+                            AddCell(table, contact.IsReplied == true ? "Replied" : (contact.IsRead == true ? "Read" : "New"), dataFont, rowColor);
+                        }
+
+                        document.Add(table);
+
+                        // Add summary with custom styling
+                        var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(5, 61, 118));
+                        var summary = new Paragraph($"Total Messages: {contacts.Count}", summaryFont);
+                        summary.Alignment = Element.ALIGN_RIGHT;
+                        summary.SpacingBefore = 20f;
+                        document.Add(summary);
+
+                        document.Close();
+                    }
+
+                    return File(ms.ToArray(), "application/pdf", "contact_messages.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Health Blogs
+        public async Task<IActionResult> HealthBlogs()
+        {
+            try
+            {
+                var blogs = await _context.HealthBlogs
+                    .OrderByDescending(b => b.CreatedAt)
+                    .ToListAsync();
+
+                return View(blogs);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading blogs: {ex.Message}";
+                return View(new List<HealthBlog>());
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddBlog(string title, string content, string type, string category, IFormFile contentUrl)
+        {
+            try
+            {
+                string imagePath = null;
+                if (contentUrl != null && contentUrl.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(contentUrl.FileName);
+                    var imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(imageDirectory))
+                    {
+                        Directory.CreateDirectory(imageDirectory);
+                    }
+
+                    var fullPath = Path.Combine(imageDirectory, fileName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await contentUrl.CopyToAsync(stream);
+                    }
+                    imagePath = fileName;
+                }
+
+                var blog = new HealthBlog
+                {
+                    Title = title,
+                    Content = content,
+                    Type = type,
+                    Category = category,
+                    ContentUrl = imagePath,
+                    PublishDate = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                };
+
+                await _context.HealthBlogs.AddAsync(blog);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Blog added successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBlog(int id, string title, string content, string type, string category, IFormFile contentUrl)
+        {
+            try
+            {
+                var blog = await _context.HealthBlogs.FindAsync(id);
+                if (blog == null)
+                {
+                    return Json(new { success = false, message = "Blog not found" });
+                }
+
+                blog.Title = title;
+                blog.Content = content;
+                blog.Type = type;
+                blog.Category = category;
+
+                if (contentUrl != null && contentUrl.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(contentUrl.FileName);
+                    var imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(imageDirectory))
+                    {
+                        Directory.CreateDirectory(imageDirectory);
+                    }
+
+                    var fullPath = Path.Combine(imageDirectory, fileName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await contentUrl.CopyToAsync(stream);
+                    }
+
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(blog.ContentUrl))
+                    {
+                        var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", blog.ContentUrl);
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    blog.ContentUrl = fileName;
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Blog updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBlog(int id)
+        {
+            try
+            {
+                var blog = await _context.HealthBlogs.FindAsync(id);
+                if (blog == null)
+                {
+                    return Json(new { success = false, message = "Blog not found" });
+                }
+
+                // Delete image if exists
+                if (!string.IsNullOrEmpty(blog.ContentUrl))
+                {
+                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/blogs", blog.ContentUrl);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
+                _context.HealthBlogs.Remove(blog);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Blog deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBlog(int id)
+        {
+            try
+            {
+                var blog = await _context.HealthBlogs.FindAsync(id);
+                if (blog == null)
+                {
+                    return Json(new { success = false, message = "Blog not found" });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = blog.Id,
+                        title = blog.Title,
+                        content = blog.Content,
+                        type = blog.Type,
+                        category = blog.Category,
+                        contentUrl = blog.ContentUrl
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }

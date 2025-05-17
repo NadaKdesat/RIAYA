@@ -1,4 +1,348 @@
-﻿@{
+﻿@model IEnumerable<RIAYA.Models.HealthBlog>
+@{
     ViewData["Title"] = "Health Blogs";
     Layout = "_AdminLayout";
+}
+
+@section Style {
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="~/css/healthBlogs.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="px-4">
+    <div class="container-fluid d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4 fw-bold">Health Blogs</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+            <i class="fas fa-plus"></i> Add New Blog
+        </button>
+    </div>
+
+    <div class="row">
+        @foreach (var blog in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="blog-card">
+                    @if (!string.IsNullOrEmpty(blog.ContentUrl))
+                    {
+                        <img src="~/images/@blog.ContentUrl" class="blog-image" alt="@blog.Title">
+                    }
+                    <div class="blog-content">
+                        <h3 class="blog-title">@blog.Title</h3>
+                        <div class="blog-meta">
+                            <span><i class="fas fa-tag"></i> @blog.Category</span> |
+                            <span><i class="fas fa-calendar"></i> @blog.PublishDate?.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        <p class="blog-description">@(blog.Content?.Length > 100 ? blog.Content.Substring(0, 100) + "..." : blog.Content)</p>
+                        <div class="blog-actions">
+                            <button class="btn edit-btn" onclick="editBlog(@blog.Id)">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn delete-btn" onclick="deleteBlog(@blog.Id)">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Add Blog Modal -->
+<div class="modal fade" id="addBlogModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Blog</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBlogForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" rows="5" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <select class="form-control" id="type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Article">Article</option>
+                                    <option value="News">News</option>
+                                    <option value="Tips">Tips</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control" id="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="General Health">General Health</option>
+                                    <option value="Nutrition">Nutrition</option>
+                                    <option value="Fitness">Fitness</option>
+                                    <option value="Mental Health">Mental Health</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contentUrl" class="form-label">Blog Image</label>
+                        <input type="file" class="form-control" id="contentUrl" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Blog
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Blog Modal -->
+<div class="modal fade" id="editBlogModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Blog</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBlogForm">
+                    <input type="hidden" id="editId">
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editContent" class="form-label">Content</label>
+                        <textarea class="form-control" id="editContent" rows="5" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editType" class="form-label">Type</label>
+                                <select class="form-control" id="editType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Article">Article</option>
+                                    <option value="News">News</option>
+                                    <option value="Tips">Tips</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editCategory" class="form-label">Category</label>
+                                <select class="form-control" id="editCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="General Health">General Health</option>
+                                    <option value="Nutrition">Nutrition</option>
+                                    <option value="Fitness">Fitness</option>
+                                    <option value="Mental Health">Mental Health</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editContentUrl" class="form-label">Blog Image</label>
+                        <input type="file" class="form-control" id="editContentUrl" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Blog
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Add Blog Form Submission
+            $('#addBlogForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData();
+                formData.append('title', $('#title').val());
+                formData.append('content', $('#content').val());
+                formData.append('type', $('#type').val());
+                formData.append('category', $('#category').val());
+                if ($('#contentUrl')[0].files[0]) {
+                    formData.append('contentUrl', $('#contentUrl')[0].files[0]);
+                }
+
+                $.ajax({
+                    url: '/Admin/AddBlog',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while adding the blog.'
+                        });
+                    }
+                });
+            });
+
+            // Edit Blog Form Submission
+            $('#editBlogForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData();
+                formData.append('id', $('#editId').val());
+                formData.append('title', $('#editTitle').val());
+                formData.append('content', $('#editContent').val());
+                formData.append('type', $('#editType').val());
+                formData.append('category', $('#editCategory').val());
+                if ($('#editContentUrl')[0].files[0]) {
+                    formData.append('contentUrl', $('#editContentUrl')[0].files[0]);
+                }
+
+                $.ajax({
+                    url: '/Admin/UpdateBlog',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while updating the blog.'
+                        });
+                    }
+                });
+            });
+        });
+
+        function editBlog(id) {
+            console.log('Editing blog with ID:', id);
+            $.ajax({
+                url: `/Admin/GetBlog/${id}`,
+                type: 'GET',
+                success: function (response) {
+                    console.log('GetBlog response:', response);
+                    if (response.success) {
+                        var blog = response.data;
+                        $('#editId').val(blog.id);
+                        $('#editTitle').val(blog.title);
+                        $('#editContent').val(blog.content);
+                        $('#editType').val(blog.type);
+                        $('#editCategory').val(blog.category);
+
+                        // Show the modal
+                        var editModal = new bootstrap.Modal(document.getElementById('editBlogModal'));
+                        editModal.show();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'Failed to load blog details'
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching blog:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'An error occurred while fetching the blog details.'
+                    });
+                }
+            });
+        }
+
+        function deleteBlog(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Admin/DeleteBlog',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'An error occurred while deleting the blog.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 }

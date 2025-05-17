@@ -1,4 +1,214 @@
-﻿@{
+﻿@model IEnumerable<RIAYA.Models.Contact>
+@{
     ViewData["Title"] = "Contact Us";
     Layout = "_AdminLayout";
+}
+@section Style {
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="~/css/contactUsAdmin.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4 fw-bold">Contact Messages</h2>
+        <a href="@Url.Action("DownloadContactsPDF", "Admin")" class="btn btn-primary">
+            <i class="fas fa-file-pdf"></i> Download Messages PDF
+        </a>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="searchName" class="form-label">Search by Name or Subject</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchName" placeholder="Enter name or subject...">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="filterStatus" class="form-label">Status</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-filter"></i>
+                        </span>
+                        <select class="form-control" id="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="new">New</option>
+                            <option value="read">Read</option>
+                            <option value="replied">Replied</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Table -->
+    <div class="table-responsive">
+        <table class="table table-hover" id="messagesTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var contact in Model)
+                {
+                    <tr>
+                        <td>@contact.FullName</td>
+                        <td>@contact.Email</td>
+                        <td>@contact.Subject</td>
+                        <td>@(contact.Message?.Length > 50 ? contact.Message.Substring(0, 50) + "..." : contact.Message)</td>
+                        <td>@contact.CreatedAt?.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td>
+                            <span class="status-badge @(contact.IsReplied == true ? "status-replied" : (contact.IsRead == true ? "status-read" : "status-new"))">
+                                @(contact.IsReplied == true ? "Replied" : (contact.IsRead == true ? "Read" : "New"))
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-view-message" onclick="showMessage('@contact.Id')">
+                                <i class="fas fa-eye"></i> View & Reply
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Message Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="message-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>From:</strong> <span id="senderName"></span></p>
+                            <p><strong>Email:</strong> <span id="senderEmail"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Date:</strong> <span id="messageDate"></span></p>
+                            <p><strong>Subject:</strong> <span id="messageSubject"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-content" id="messageContent"></div>
+                <div class="reply-form">
+                    <h6 class="mb-3">Reply to Message</h6>
+                    <form id="replyForm">
+                        <input type="hidden" id="contactId" />
+                        <div class="mb-3">
+                            <label for="replySubject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="replySubject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="replyMessage" class="form-label">Message</label>
+                            <textarea class="form-control" id="replyMessage" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Reply
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Search and filter handlers
+            $('#searchName').on('keyup', function () {
+                $('#messagesTable').DataTable().search($(this).val()).draw();
+            });
+
+            $('#filterStatus').on('change', function () {
+                var status = $(this).val().toLowerCase();
+                $('#messagesTable').DataTable().column(5).search(status).draw();
+            });
+
+            // Reply form submission
+            $('#replyForm').on('submit', function (e) {
+                e.preventDefault();
+                var contactId = $('#contactId').val();
+                var subject = $('#replySubject').val();
+                var message = $('#replyMessage').val();
+
+                $.post('/Admin/SendReply', {
+                    contactId: contactId,
+                    subject: subject,
+                    message: message
+                }, function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Reply sent successfully',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            $('#messageModal').modal('hide');
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message
+                        });
+                    }
+                });
+            });
+
+            // إضافة refresh للصفحة عند إغلاق المودال
+            $('#messageModal').on('hidden.bs.modal', function () {
+                location.reload();
+            });
+        });
+
+        function showMessage(id) {
+            $.get(`/Admin/GetContactMessage/${id}`, function (response) {
+                if (response.success) {
+                    var data = response.data;
+                    $('#contactId').val(id);
+                    $('#senderName').text(data.fullName);
+                    $('#senderEmail').text(data.email);
+                    $('#messageDate').text(new Date(data.createdAt).toLocaleString());
+                    $('#messageSubject').text(data.subject);
+                    $('#messageContent').text(data.message);
+                    $('#replySubject').val('Re: ' + data.subject);
+                    $('#messageModal').modal('show');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message
+                    });
+                }
+            });
+        }
+    </script>
 }

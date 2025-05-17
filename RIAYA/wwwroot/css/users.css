@@ -1,0 +1,137 @@
+﻿:root {
+    --primary-color: #053D76;
+    --secondary-color: #E6F0FF;
+    --white-color: #FFFFFF;
+}
+
+.user-card {
+    background-color: var(--white-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+}
+
+    .user-card:hover {
+        transform: translateY(-5px);
+    }
+
+.user-header {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+}
+
+.user-body {
+    padding: 20px;
+}
+
+.user-info {
+    margin-bottom: 15px;
+}
+
+    .user-info i {
+        color: var(--primary-color);
+        margin-right: 10px;
+    }
+
+.appointments-section {
+    background-color: var(--secondary-color);
+    padding: 15px;
+    border-radius: 0 0 10px 10px;
+}
+
+.appointment-card {
+    background-color: var(--white-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.appointment-type {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.appointment-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.status-confirmed {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: black;
+}
+
+.filters-section {
+    background-color: var(--white-color);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-label {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.input-group-text {
+    background-color: var(--secondary-color);
+    border: none;
+}
+
+.form-control {
+    border: 1px solid var(--secondary-color);
+}
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(5, 61, 118, 0.25);
+    }
+
+.table thead th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-view-appointments {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+}
+
+    .btn-view-appointments:hover {
+        background-color: #042c5a;
+        color: var(--white-color);
+    }
+
+.mt-4.fw-bold {
+    color: #053D76;
+    font-size: 1.75rem;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}

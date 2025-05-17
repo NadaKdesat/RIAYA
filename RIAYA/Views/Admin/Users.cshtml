@@ -1,4 +1,209 @@
-﻿@{
+﻿@model IEnumerable<RIAYA.Models.User>
+@{
     ViewData["Title"] = "Users";
     Layout = "_AdminLayout";
+}
+@section Style {
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="~/css/users.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4 fw-bold">Users Management</h2>
+        <a href="@Url.Action("DownloadUsersPDF", "Admin")" class="btn btn-primary">
+            <i class="fas fa-file-pdf"></i> Download Users PDF
+        </a>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="searchName" class="form-label">Search by Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchName" placeholder="Enter user name...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-responsive">
+        <table class="table table-hover" id="usersTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Joined Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Where(u => u.UserType == "user"))
+                {
+                    <tr>
+                        <td>@user.FullName</td>
+                        <td>@user.Email</td>
+                        <td>@(string.IsNullOrWhiteSpace(user.Phone) ? "--" : user.Phone)</td>
+                        <td>@(string.IsNullOrWhiteSpace(user.City) ? "--" : user.City)</td>
+                        <td>@(user.CreatedAt.HasValue ? user.CreatedAt.Value.ToString("MMM dd, yyyy") : "--")</td>
+                        <td>
+                            <button class="btn btn-view-appointments" onclick="showAppointments('@user.Id', '@user.FullName')">
+                                <i class="fas fa-calendar-alt"></i> View Appointments
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Appointments Modal -->
+<div class="modal fade" id="appointmentsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Appointments for <span id="userName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="appointmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Patient Name</th>
+                                <th>Gender</th>
+                                <th>Birth Date</th>
+                                <th>Category</th>
+                                <th>Provider</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsList">
+                            <tr>
+                                <td colspan="9" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Search handler
+            $('#searchName').on('keyup', function () {
+                $('#usersTable').DataTable().search($(this).val()).draw();
+            });
+        });
+
+        function showAppointments(userId, userName) {
+            console.log("Showing appointments for user:", userId, userName);
+            $('#userName').text(userName);
+            $('#appointmentsModal').modal('show');
+            loadUserAppointments(userId);
+        }
+
+        function loadUserAppointments(userId) {
+            console.log("Loading appointments for user ID:", userId);
+
+            // Show loading state
+            var appointmentsList = $('#appointmentsList');
+            appointmentsList.html('<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+
+            $.ajax({
+                url: `/api/appointments/user/${userId}`,
+                method: 'GET',
+                success: function (response) {
+                    console.log("Appointments response:", response);
+
+                    appointmentsList.empty();
+
+                    if (!response.success) {
+                        console.error("Failed to load appointments:", response.message);
+                        appointmentsList.html('<tr><td colspan="9" class="text-center text-danger">Error loading appointments</td></tr>');
+                        return;
+                    }
+
+                    if (!response.data || response.data.length === 0) {
+                        appointmentsList.html('<tr><td colspan="9" class="text-center">No appointments found</td></tr>');
+                        return;
+                    }
+
+                    response.data.forEach(function (appointment) {
+                        console.log("Processing appointment:", appointment);
+                        var appointmentHtml = `
+                            <tr>
+                                <td>${appointment.bookingType}</td>
+                                <td>${appointment.patientFullName}</td>
+                                <td>${appointment.patientGender}</td>
+                                <td>${formatDate(appointment.patientBirthDate)}</td>
+                                <td>${appointment.categoryName}</td>
+                                <td>${appointment.providerName}</td>
+                                <td>${formatDate(appointment.appointmentDateTime)}</td>
+                                <td>${formatTime(appointment.appointmentDateTime)}</td>
+                                <td>
+                                    <span class="badge ${appointment.status.toLowerCase() === 'confirmed' ? 'bg-success' : 'bg-warning'}">
+                                        ${appointment.status}
+                                    </span>
+                                    ${appointment.bookingType === 'Electronic Consultation' && appointment.consultationLink ?
+                                        `<a href="${appointment.consultationLink}" target="_blank" class="btn btn-sm btn-primary ms-2">
+                                            <i class="fas fa-video"></i> Join
+                                        </a>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                        appointmentsList.append(appointmentHtml);
+                    });
+                },
+                error: function (error) {
+                    console.error("Error loading appointments:", error);
+                    appointmentsList.html('<tr><td colspan="9" class="text-center text-danger">Error loading appointments</td></tr>');
+                }
+            });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                return new Date(dateString).toLocaleDateString();
+            } catch (e) {
+                console.error("Error formatting date:", e);
+                return 'Invalid Date';
+            }
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                return new Date(dateString).toLocaleTimeString();
+            } catch (e) {
+                console.error("Error formatting time:", e);
+                return 'Invalid Time';
+            }
+        }
+    </script>
 }

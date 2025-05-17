@@ -1,0 +1,114 @@
+﻿:root {
+    --primary-color: #053D76;
+    --secondary-color: #E6F0FF;
+    --white-color: #FFFFFF;
+}
+
+.filters-section {
+    background-color: var(--white-color);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-label {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.input-group-text {
+    background-color: var(--secondary-color);
+    border: none;
+}
+
+.form-control {
+    border: 1px solid var(--secondary-color);
+}
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(5, 61, 118, 0.25);
+    }
+
+.table thead th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-view-message {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+}
+
+    .btn-view-message:hover {
+        background-color: #042c5a;
+        color: var(--white-color);
+    }
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.status-new {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-read {
+    background-color: #ffc107;
+    color: black;
+}
+
+.status-replied {
+    background-color: #28a745;
+    color: white;
+}
+
+.message-content {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.reply-form {
+    margin-top: 20px;
+}
+
+.mt-4.fw-bold {
+    color: #053D76;
+    font-size: 1.75rem;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+table.dataTable > thead .sorting:after, table.dataTable > thead .sorting_asc:after, table.dataTable > thead .sorting_desc:after, table.dataTable > thead .sorting_asc_disabled:after, table.dataTable > thead .sorting_desc_disabled:after {
+    right: .5em;
+    content: "";
+}
+
+.btn-view-message {
+    white-space: nowrap;
+}
