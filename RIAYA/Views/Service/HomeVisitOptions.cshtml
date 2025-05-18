@@ -35,12 +35,12 @@
 </main>
 
 
-@{
+@* @{
     var isLoggedIn = Context.Session.GetString("IsLoggedIn") ?? Context.Request.Cookies["IsLoggedIn"];
 }
 
 <!-- Instant Care Modal -->
-@if (isLoggedIn == "true")
+@if (isLoggedIn == "true") *@
 {
 <!-- Instant Care Modal -->
 <div class="modal fade" id="instantCareModal" tabindex="-1" aria-labelledby="instantCareModalLabel" aria-hidden="true">
@@ -386,22 +386,34 @@
             </div>
         </div>
     </div>
-}
+@* }
 else
 {
     <script>
         window.location.href = '@Url.Action("Login", "User")';
     </script>
-}
+} *@
 
 @section Scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3zp3g_RSuaf2b9OmFbOiGFJPtrPZlSlc" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        window.openInstantCareModal = function () {
-            const modal = new bootstrap.Modal(document.getElementById('instantCareModal'));
-            modal.show();
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            var isLoggedIn = "@(Context.Session.GetString("IsLoggedIn") ?? Context.Request.Cookies["IsLoggedIn"] ?? "false")";
+
+            window.openInstantCareModal = function () {
+                if (isLoggedIn === "true") {
+                    const modal = new bootstrap.Modal(document.getElementById('instantCareModal'));
+                    modal.show();
+                } else {
+                    window.location.href = '/User/Login';
+                }
+            };
+        });
+        // window.openInstantCareModal = function () {
+        //     const modal = new bootstrap.Modal(document.getElementById('instantCareModal'));
+        //     modal.show();
+        // }
 
         let selectedCategoryName = '';
         let selectedServiceName = '';
@@ -454,7 +466,7 @@ else
             document.getElementById('finishBtn').style.display = step === totalSteps ? 'inline-block' : 'none';
 
             if (step === 2 && !mapInitialized) {
-                setTimeout(initMap, 500); // تأخير بسيط للتأكد أن العنصر موجود
+                setTimeout(initMap, 500);
             }
 
                     if (currentStep === 3) {
@@ -467,10 +479,10 @@ else
         }
 
         function initMap() {
-            if (mapInitialized) return; // التأكد من تحميل الخريطة مرة واحدة فقط
+            if (mapInitialized) return; 
             mapInitialized = true;
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 31.963158, lng: 35.930359 }, // مركز عمّان
+                center: { lat: 31.963158, lng: 35.930359 }, 
                 zoom: 13
             });
 
@@ -573,10 +585,19 @@ else
 
 
     <script>
-        window.openHomeCareModal = function () {
-            const modal = new bootstrap.Modal(document.getElementById('homeCareModal'));
-            modal.show();
-        }
+
+            document.addEventListener("DOMContentLoaded", function () {
+            var isLoggedIn = "@(Context.Session.GetString("IsLoggedIn") ?? Context.Request.Cookies["IsLoggedIn"] ?? "false")";
+
+            window.openHomeCareModal = function () {
+                if (isLoggedIn === "true") {
+                    const modal = new bootstrap.Modal(document.getElementById('homeCareModal'));
+                    modal.show();
+                } else {
+                    window.location.href = '/User/Login';
+                }
+            };
+        });
 
         let homeCareSelectedCategoryName = '';
         let homeCareSelectedServiceName = '';

@@ -22,7 +22,10 @@
             <div class="blog-card">
                 @if (!string.IsNullOrEmpty(blog.ContentUrl))
                 {
-                    <img src="@blog.ContentUrl" class="blog-img" alt="Blog image" />
+                    <div class="blog-img">
+                        <img src="~/images/@blog.ContentUrl" alt="Blog image" />
+                    </div>
+
                 }
                 else
                 {

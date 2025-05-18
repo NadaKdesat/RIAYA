@@ -212,7 +212,7 @@
 .detail-item i {
     width: 24px;
     margin-right: 0.75rem;
-    color: #053D76;
+    color: #053D76 !important;
 }
 
 .detail-item span {
