@@ -106,8 +106,7 @@ namespace RIAYA.Controllers
                 //Get available instant appointments in provider's category
                 var availableInstantAppointments = await _context.InstantHomeCareAppointments
                     .Where(a => a.ProviderId == null &&
-                               a.Service.CategoryId == provider.CategoryId &&
-                               a.CreatedAt >= currentDate)
+                               a.Service.CategoryId == provider.CategoryId)
                     .OrderBy(a => a.CreatedAt)
                     .ToListAsync();
 
@@ -244,7 +243,7 @@ namespace RIAYA.Controllers
 
                 // Fetch upcoming appointments
                 var upcomingInstantAppointments = await _context.InstantHomeCareAppointments
-                    .Where(a => a.ProviderId == providerId && a.CreatedAt >= currentDate)
+                    .Where(a => a.ProviderId == providerId)
                     .OrderBy(a => a.CreatedAt)
                     .ToListAsync();
 
@@ -267,10 +266,10 @@ namespace RIAYA.Controllers
                     .ToListAsync();
 
                 // Fetch past appointments
-                var pastInstantAppointments = await _context.InstantHomeCareAppointments
-                    .Where(a => a.ProviderId == providerId && a.CreatedAt < currentDate)
-                    .OrderByDescending(a => a.CreatedAt)
-                    .ToListAsync();
+                //var pastInstantAppointments = await _context.InstantHomeCareAppointments
+                //    .Where(a => a.ProviderId == providerId && a.CreatedAt < currentDate)
+                //    .OrderByDescending(a => a.CreatedAt)
+                //    .ToListAsync();
 
                 var pastHomeCareAppointments = await _context.HomeCareAppointments
                     .Where(a => a.ProviderId == providerId &&
@@ -293,7 +292,7 @@ namespace RIAYA.Controllers
                 ViewBag.UpcomingInstantAppointments = upcomingInstantAppointments;
                 ViewBag.UpcomingHomeCareAppointments = upcomingHomeCareAppointments;
                 ViewBag.UpcomingElectronicConsultations = upcomingElectronicConsultations;
-                ViewBag.PastInstantAppointments = pastInstantAppointments;
+                //ViewBag.PastInstantAppointments = pastInstantAppointments;
                 ViewBag.PastHomeCareAppointments = pastHomeCareAppointments;
                 ViewBag.PastElectronicConsultations = pastElectronicConsultations;
 

@@ -148,24 +148,201 @@ body {
             background-color: #cc0000;
         }
 
+@media (max-width: 1200px) {
+    .container {
+        max-width: 95%;
+        margin: 1.5rem auto;
+    }
+
+    .header {
+        padding: 12rem 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .header {
+        padding: 10rem 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .cards {
+        gap: 1rem;
+    }
+
+    .card {
+        padding: 1.2rem;
+    }
+
+    .card button {
+        margin-top: 1rem;
+    }
+}
+
 @media (max-width: 768px) {
     .header {
         margin-top: 60px;
+        padding: 6rem 1rem;
     }
 
-        .header h1 {
-            font-size: 1.5rem;
-        }
+    .header h1 {
+        font-size: 1.8rem;
+        margin-left: 10px;
+    }
 
-    .intro h2 {
+    .container {
+        padding: 0.5rem;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .card {
+        padding: 1.2rem;
+    }
+
+    .card h3 {
         font-size: 1.5rem;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+    }
+
+    .card .white {
+        width: 140px;
+        left: 20px;
+    }
+
+    h2 {
+        font-size: 28px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    /* Modal Responsive Styles */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+    }
+
+    #map, #homeCareMap {
+        height: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .header {
+        padding: 4rem 0.8rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+        margin-left: 5px;
+    }
+
+    .container {
+        margin: 1rem auto;
     }
 
     .card {
         padding: 1rem;
     }
-}
 
+    .card h3 {
+        font-size: 1.3rem;
+    }
+
+    .card p {
+        font-size: 0.85rem;
+    }
+
+    .card .white {
+        width: 120px;
+        left: 15px;
+    }
+
+    .card button {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+
+    /* Modal Responsive Styles */
+    .modal-header {
+        padding: 0.8rem;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 0.8rem;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    .form-control, .form-select {
+        font-size: 13px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .modal-footer {
+        padding: 0.8rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    #map, #homeCareMap {
+        height: 200px;
+    }
+
+    #bookingDetails, #homeCareBookingDetails {
+        padding: 10px;
+    }
+
+    #bookingDetails h5, #homeCareBookingDetails h5 {
+        font-size: 1rem;
+    }
+
+    #bookingDetails p, #homeCareBookingDetails p {
+        font-size: 0.9rem;
+    }
+}
 
 h2 {
     font-family: 'Lato';

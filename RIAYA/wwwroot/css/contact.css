@@ -217,3 +217,189 @@ body {
         padding: 12px 20px;
     }
 }
+
+/* Responsive Design Rules */
+@media (max-width: 1200px) {
+    .container {
+        width: 90%;
+        margin: 50px auto;
+    }
+
+    .form-container {
+        gap: 40px;
+    }
+
+    .info h2 {
+        font-size: 28px;
+    }
+
+    .info p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 992px) {
+    .contact-us {
+        padding: 150px 20px;
+    }
+
+    .contact-us h1 {
+        font-size: 2.2em;
+    }
+
+    .container {
+        width: 95%;
+        margin: 40px auto;
+    }
+
+    .form-container {
+        gap: 30px;
+    }
+
+    .info h2 {
+        font-size: 26px;
+    }
+
+    .info .grid {
+        gap: 15px;
+    }
+
+    .info .grid .info-details {
+        gap: 12px;
+    }
+
+    .info .grid .info-details img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-us {
+        padding: 120px 15px;
+    }
+
+    .contact-us h1 {
+        font-size: 2em;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .form-container {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .form-container .form,
+    .form-container .info {
+        width: 100%;
+    }
+
+    .info h2 {
+        font-size: 24px;
+    }
+
+    .info p {
+        margin: 10px 0 30px 0;
+    }
+
+    .info .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .info .grid .info-details {
+        gap: 15px;
+    }
+
+    .info .grid .info-details img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .Follow-Us {
+        font-size: 18px;
+    }
+
+    .social-icon a {
+        font-size: 1.1rem;
+        padding: 5px 8px;
+    }
+
+    .map iframe {
+        height: 350px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-us {
+        padding: 100px 10px;
+    }
+
+    .contact-us h1 {
+        font-size: 1.8em;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .form label {
+        font-size: 0.95rem;
+    }
+
+    .form input, 
+    .form textarea {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .form textarea {
+        height: 120px;
+    }
+
+    .form button {
+        padding: 12px 25px;
+        font-size: 0.95rem;
+    }
+
+    .info h5 {
+        font-size: 14px;
+    }
+
+    .info h2 {
+        font-size: 22px;
+    }
+
+    .info p {
+        font-size: 0.95rem;
+    }
+
+    .info div span {
+        font-size: 0.95rem;
+    }
+
+    .info div p {
+        font-size: 0.9rem;
+    }
+
+    .Follow-Us {
+        font-size: 16px;
+    }
+
+    .social-icon {
+        margin: 12px 0;
+    }
+
+    .social-icon a {
+        font-size: 1rem;
+        padding: 4px 7px;
+    }
+
+    .map iframe {
+        height: 300px;
+    }
+}

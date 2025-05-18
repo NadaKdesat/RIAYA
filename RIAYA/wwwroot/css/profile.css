@@ -589,3 +589,179 @@ p {
         font-size: 0.9rem;
     }
 }
+
+/* Responsive Design Rules */
+@media (max-width: 1200px) {
+    #form-container {
+        width: 70vw;
+    }
+
+    #form-container input {
+        width: 65vw;
+    }
+
+    .ProfileImg {
+        width: 18vw;
+        height: 18vw;
+    }
+
+    .button-group input {
+        width: 12vw !important;
+    }
+}
+
+@media (max-width: 992px) {
+    #form-container {
+        width: 80vw;
+    }
+
+    #form-container input {
+        width: 75vw;
+    }
+
+    .ProfileImg {
+        width: 20vw;
+        height: 20vw;
+    }
+
+    .button-group input {
+        width: 15vw !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #form-container {
+        width: 90vw;
+        padding: 15px;
+    }
+
+    #form-container input {
+        width: 85vw;
+    }
+
+    .ProfileImg {
+        width: 25vw;
+        height: 25vw;
+    }
+
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button-group input {
+        width: 200px !important;
+        margin: 5px 0;
+    }
+
+    .row {
+        justify-content: center;
+    }
+
+    /* Modal Responsive Styles */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .form-label {
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    #form-container {
+        width: 95vw;
+        padding: 10px;
+        margin-top: 1em;
+    }
+
+    #form-container input {
+        width: 90vw;
+        font-size: 0.9rem;
+    }
+
+    .ProfileImg {
+        width: 35vw;
+        height: 35vw;
+    }
+
+    .labels {
+        font-size: 0.9rem;
+    }
+
+    .button-group input {
+        width: 180px !important;
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+
+    /* Modal Responsive Styles */
+    .modal-header {
+        padding: 0.8rem;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 0.8rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .modal-footer {
+        padding: 0.8rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    /* View Bookings Modal Responsive Styles */
+    #viewBookingsModal .nav-tabs .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    #viewBookingsModal .table thead th {
+        padding: 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    #viewBookingsModal .table tbody td {
+        padding: 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    #viewBookingsModal .status-badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    #viewBookingsModal .btn-danger {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+}
