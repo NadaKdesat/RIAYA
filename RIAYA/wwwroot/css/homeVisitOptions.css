@@ -183,3 +183,99 @@ p {
 .hidden {
     display: none;
 }
+
+/* Modal Styles */
+.modal-content {
+    background-color: #FFFFFF;
+    border: 2px solid #053D76;
+}
+
+.modal-header {
+    background-color: #053D76;
+    color: #FFFFFF;
+    border-bottom: 2px solid #053D76;
+}
+
+    .modal-header .btn-close {
+        color: #FFFFFF;
+        filter: brightness(0) invert(1);
+    }
+
+.modal-body {
+    background-color: #FFFFFF;
+}
+
+.modal-footer {
+    background-color: #E6F0FF;
+    border-top: 2px solid #053D76;
+}
+
+/* Form Elements */
+.form-label {
+    color: #053D76;
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    border: 1px solid #053D76;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #053D76;
+        box-shadow: 0 0 0 0.2rem rgba(5, 61, 118, 0.25);
+    }
+
+/* Buttons */
+.modal-footer .btn-primary {
+    background-color: #053D76;
+    border-color: #053D76;
+    color: #FFFFFF;
+}
+
+    .modal-footer .btn-primary:hover {
+        background-color: #042a54;
+        border-color: #042a54;
+    }
+
+.modal-footer .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #FFFFFF;
+}
+
+    .modal-footer .btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+/* Map Container */
+#map, #homeCareMap {
+    border: 2px solid #053D76;
+    border-radius: 4px;
+}
+
+/* Alert Messages */
+/*.alert-success {
+    background-color: #E6F0FF;
+    border-color: #053D76;
+    color: #053D76;
+}*/
+
+/* Booking Details Section */
+#bookingDetails, #homeCareBookingDetails {
+    background-color: #E6F0FF;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #053D76;
+    margin-bottom: 20px;
+}
+
+    #bookingDetails h5, #homeCareBookingDetails h5 {
+        color: #053D76;
+        margin-bottom: 10px;
+    }
+
+    #bookingDetails p, #homeCareBookingDetails p {
+        color: #053D76;
+        margin-bottom: 5px;
+    }

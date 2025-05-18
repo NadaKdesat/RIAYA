@@ -271,7 +271,7 @@ public partial class MyDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__SessionR__3214EC0782C9EE5D");
 
-            entity.Property(e => e.AppointmentType).HasMaxLength(20);
+            entity.Property(e => e.AppointmentType).HasMaxLength(30);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");

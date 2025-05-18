@@ -114,9 +114,9 @@
                     <option value="?sortBy=experience&specialty=@ViewData["SelectedCategoryName"]&gender=@ViewData["SelectedGender"]&minExperience=@ViewData["SelectedMinExperience"]&maxExperience=@ViewData["SelectedMaxExperience"]">
                         Sort by Experience
                     </option>
-                    <option value="?sortBy=rating&specialty=@ViewData["SelectedCategoryName"]&gender=@ViewData["SelectedGender"]&minExperience=@ViewData["SelectedMinExperience"]&maxExperience=@ViewData["SelectedMaxExperience"]">
+@*                     <option value="?sortBy=rating&specialty=@ViewData["SelectedCategoryName"]&gender=@ViewData["SelectedGender"]&minExperience=@ViewData["SelectedMinExperience"]&maxExperience=@ViewData["SelectedMaxExperience"]">
                         Sort by Rating
-                    </option>
+                    </option> *@
                 </select>
             </div>
         </div>
@@ -145,12 +145,14 @@
                             </span>
                             <span class="doctor-days">
                                 <i class="fa-solid fa-calendar-week"></i>
-                                @string.Join(", ", item.Availability.Select(av => GetDayAbbreviation(av.DayOfWeek)))
+                                    @string.Join(", ", item.Availability
+                                             .Select(av => GetDayAbbreviation(av.DayOfWeek))
+                                             .Distinct())
                             </span>
-                            <div class="doctor-rating mt-5">
+@*                             <div class="doctor-rating mt-5">
                                 <span class="stars">★★★★★</span>
                                 <span class="reviews">(38)</span>
-                            </div>
+                            </div> *@
                         </div>
                     </div>
                 </div>

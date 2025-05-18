@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RIAYA.Models;
 
+
 namespace RIAYA.Controllers
 {
     public class ServiceController : Controller
@@ -16,8 +17,10 @@ namespace RIAYA.Controllers
         public IActionResult Services(int? categoryId)
         {
             var categoriesWithServices = _context.ServiceCategories
-                .Include(c => c.Services)
+                .Where(c => !c.IsDeleted)
+                .Include(c => c.Services.Where(s => !s.IsDeleted))
                 .ToList();
+
 
             if (categoryId.HasValue)
             {
@@ -34,7 +37,8 @@ namespace RIAYA.Controllers
         public IActionResult HomeVisitOptions(int? categoryId)
         {
             var categoriesWithServices = _context.ServiceCategories
-                .Include(c => c.Services)
+                .Where(c => !c.IsDeleted)
+                .Include(c => c.Services.Where(s => !s.IsDeleted))
                 .ToList();
 
             if (categoryId.HasValue)
@@ -95,7 +99,7 @@ namespace RIAYA.Controllers
             appointment.ServiceId = selectedServiceId;
             appointment.Status = "Pending";
             appointment.IsConfirmed = false;
-            appointment.CreatedAt = DateTime.UtcNow;
+            appointment.CreatedAt = DateTime.Now;
 
             // إضافة الحجز إلى قاعدة البيانات
             _context.InstantHomeCareAppointments.Add(appointment);
@@ -107,12 +111,27 @@ namespace RIAYA.Controllers
 
 
         [HttpGet]
-        public JsonResult GetServicesByCategory(int categoryId)
+        public JsonResult GetHomeCareServicesByCategory(int categoryId)
         {
             var services = _context.Services
-                .Where(s => s.CategoryId == categoryId)
-                .Select(s => new { s.Id, s.ServiceDescription, s.Price })
-                .ToList();
+                 .Where(s => s.CategoryId == categoryId
+                             && s.ServiceType == "HomeCare"
+                             && !s.IsDeleted)
+                 .Select(s => new { s.Id, s.ServiceDescription, s.Price })
+                 .ToList();
+
+            return Json(services);
+        }
+
+        [HttpGet]
+        public JsonResult GetConsultationServicesByCategory(int categoryId)
+        {
+            var services = _context.Services
+                 .Where(s => s.CategoryId == categoryId
+                             && s.ServiceType == "Consultation"
+                             && !s.IsDeleted)
+                 .Select(s => new { s.Id, s.ServiceDescription, s.Price })
+                 .ToList();
 
             return Json(services);
         }
@@ -136,7 +155,8 @@ namespace RIAYA.Controllers
 
             return Json(providers);
         }
-        public JsonResult GetAvailableDatesAndTimes(int providerId)
+
+        public JsonResult GetAvailableDatesAndTimes(int providerId, string serviceType)
         {
             var availability = _context.ProviderAvailabilities
                 .Where(a => a.ProviderId == providerId)
@@ -145,22 +165,43 @@ namespace RIAYA.Controllers
             var today = DateTime.Today;
             var availableDates = new List<object>();
 
-            var bookedAppointments = _context.HomeCareAppointments
-                .Where(a => a.ProviderId == providerId)
-                .Select(a => new { Date = a.AppointmentDate, Time = a.AppointmentTime })
-                .ToList();
+            List<(DateOnly Date, TimeOnly Time)> bookedAppointments;
+
+            if (serviceType == "home")
+            {
+                bookedAppointments = _context.HomeCareAppointments
+                    .Where(a => a.ProviderId == providerId)
+                    .Select(a => new { a.AppointmentDate, a.AppointmentTime })  
+                    .ToList()
+                    .Select(a => (a.AppointmentDate, a.AppointmentTime))        
+                    .ToList();
+            }
+            else if (serviceType == "consultation")
+            {
+                bookedAppointments = _context.ElectronicConsultations
+                    .Where(a => a.ProviderId == providerId)
+                    .Select(a => new { a.AppointmentDate, a.AppointmentTime })  
+                    .ToList()
+                    .Select(a => (a.AppointmentDate, a.AppointmentTime))        
+                    .ToList();
+            }
+            else
+            {
+                bookedAppointments = new List<(DateOnly, TimeOnly)>();
+            }
 
             for (int i = 0; i < 10; i++)
             {
                 var date = today.AddDays(i);
                 var dayOfWeek = (int)date.DayOfWeek;
 
-                var dayAvailability = availability.FirstOrDefault(a => a.DayOfWeek == dayOfWeek);
-                if (dayAvailability != null)
+                var dayAvailabilities = availability.Where(a => a.DayOfWeek == dayOfWeek).ToList();
+                var times = new List<string>();
+
+                foreach (var slot in dayAvailabilities)
                 {
-                    var times = new List<string>();
-                    var start = dayAvailability.StartTime;
-                    var end = dayAvailability.EndTime;
+                    var start = slot.StartTime;
+                    var end = slot.EndTime;
 
                     for (var time = start; time < end; time = time.AddHours(1))
                     {
@@ -172,29 +213,24 @@ namespace RIAYA.Controllers
                             b.Date == DateOnly.FromDateTime(date) &&
                             Math.Abs((b.Time - time).TotalMinutes) < 1);
 
-
                         if (!isBooked)
                         {
-                            times.Add(time.ToString(@"hh\:mm"));
+                            times.Add(time.ToString(@"hh\:mm tt"));
                         }
                     }
+                }
 
-                    if (times.Any())
+                if (times.Any())
+                {
+                    availableDates.Add(new
                     {
-                        availableDates.Add(new
-                        {
-                            Date = date.ToString("yyyy-MM-dd"),
-                            Times = times
-                        });
-                    }
+                        Date = date.ToString("yyyy-MM-dd"),
+                        Times = times
+                    });
                 }
             }
-
             return Json(availableDates);
         }
-
-
-
 
 
         [HttpPost]
@@ -228,7 +264,7 @@ namespace RIAYA.Controllers
             appointment.ServiceId = selectedServiceId;
             appointment.ProviderId = selectedProviderId;
             appointment.IsConfirmed = false;
-            appointment.CreatedAt = DateTime.UtcNow;
+            appointment.CreatedAt = DateTime.Now;
 
             _context.HomeCareAppointments.Add(appointment);
             await _context.SaveChangesAsync();
@@ -236,61 +272,89 @@ namespace RIAYA.Controllers
             return Json(new { success = true, message = "Your appointment has been successfully created!" });
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> SubmitConsultation(ElectronicConsultation appointment)
         {
-            // الحصول على الـ patientId من الجلسة أو الكوكيز
-            int patientId = 0;
-            string userId = HttpContext.Session.GetString("UserId") ?? Request.Cookies["UserId"];
-
-            // التحقق من أن الـ userId موجود وصحيح
-            if (!int.TryParse(userId, out patientId))
+            try
             {
-                return Json(new { success = false, message = "User ID is missing or invalid." });
-            }
+                // Get patientId from session or cookie
+                int patientId = 0;
+                string userId = HttpContext.Session.GetString("UserId") ?? Request.Cookies["UserId"];
 
-            // التحقق من أن الـ CategorySelect و ServiceSelect مختارين بشكل صحيح
-            if (!int.TryParse(Request.Form["consultationCategorySelect"], out int selectedCategoryId) ||
-                !int.TryParse(Request.Form["consultationServiceSelect"], out int selectedServiceId))
+                if (!int.TryParse(userId, out patientId))
+                {
+                    return Json(new { success = false, message = "User ID is missing or invalid." });
+                }
+
+                // Parse form data
+                if (!int.TryParse(Request.Form["CategorySelect"], out int selectedCategoryId) ||
+                    !int.TryParse(Request.Form["ServiceSelect"], out int selectedServiceId) ||
+                    !int.TryParse(Request.Form["ProviderSelect"], out int selectedProviderId))
+                {
+                    return Json(new { success = false, message = "Invalid selection in form data." });
+                }
+
+                // Get category and service from database
+                var selectedCategory = await _context.ServiceCategories.FirstOrDefaultAsync(c => c.Id == selectedCategoryId);
+                var selectedService = await _context.Services.FirstOrDefaultAsync(s => s.Id == selectedServiceId);
+                var selectedProvider = await _context.Providers.FirstOrDefaultAsync(p => p.Id == selectedProviderId);
+
+                if (selectedCategory == null || selectedService == null || selectedProvider == null)
+                {
+                    return Json(new { success = false, message = "Invalid category, service, or provider selection." });
+                }
+
+                // Parse appointment date and time
+                if (!DateOnly.TryParse(Request.Form["AppointmentDate"], out DateOnly appointmentDate) ||
+                    !TimeOnly.TryParse(Request.Form["AppointmentTime"], out TimeOnly appointmentTime))
+                {
+                    return Json(new { success = false, message = "Invalid appointment date or time." });
+                }
+
+                // Fill consultation details
+                appointment.PatientId = patientId;
+                appointment.ProviderId = selectedProviderId;
+                appointment.ServiceId = selectedServiceId;
+                appointment.PatientFullName = Request.Form["PatientFullName"];
+                appointment.PatientGender = Request.Form["PatientGender"];
+                appointment.PatientBirthDate = DateOnly.Parse(Request.Form["PatientBirthDate"]);
+                appointment.CategoryName = selectedCategory.CategoryName;
+                appointment.ServiceName = selectedService.ServiceDescription;
+                appointment.AppointmentDate = appointmentDate;
+                appointment.AppointmentTime = appointmentTime;
+                appointment.PatientConditionDescription = Request.Form["PatientConditionDescription"];
+                appointment.IsConfirmed = false;
+                appointment.ConsultationLink = "";
+                appointment.CreatedAt = DateTime.Now;
+
+                // Add to database
+                _context.ElectronicConsultations.Add(appointment);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Your consultation appointment has been successfully created!" });
+            }
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Invalid category or service selected." });
+                return Json(new { success = false, message = "An error occurred while creating your appointment: " + ex.Message });
             }
-
-            // الحصول على الـ category و الـ service من قاعدة البيانات
-            var selectedCategory = await _context.ServiceCategories.FirstOrDefaultAsync(c => c.Id == selectedCategoryId);
-            var selectedService = await _context.Services.FirstOrDefaultAsync(s => s.Id == selectedServiceId);
-
-            // التحقق من وجود الـ category والـ service
-            if (selectedCategory == null || selectedService == null)
-            {
-                return Json(new { success = false, message = "Invalid category or service selection." });
-            }
-
-            // تعبئة تفاصيل الاستشارة
-            appointment.PatientId = patientId;
-            appointment.CategoryName = selectedCategory.CategoryName;
-            appointment.ServiceName = selectedService.ServiceDescription;
-            appointment.ServiceId = selectedServiceId;
-            appointment.IsConfirmed = false;
-            appointment.ConsultationLink = "";
-            appointment.CreatedAt = DateTime.UtcNow;
-
-            _context.ElectronicConsultations.Add(appointment);
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, message = "Your consultation appointment has been successfully created!" });
         }
 
+
+        //HealthcareTeam
         public IActionResult HealthcareTeam(string? specialty, string? gender, int? minExperience, int? maxExperience, string? sortBy, string? searchQuery)
         {
             // جلب جميع التخصصات (بدون فلترة)
             var allCategories = _context.ServiceCategories
+                .Where(c => !c.IsDeleted)
                 .Select(c => c.CategoryName)
                 .Distinct()
                 .ToList();
 
             // جلب جميع مقدمي الرعاية مع العلاقات المرتبطة
             var query = _context.Providers
+                .Where(p => p.IsActive)
                 .Include(p => p.User)
                 .Include(p => p.Category)
                 .AsQueryable();
@@ -361,6 +425,9 @@ namespace RIAYA.Controllers
         }
 
 
-
+        public IActionResult DigitalHealthAdvisor(int? categoryId)
+        {
+            return View();
+        }
     }
 }
