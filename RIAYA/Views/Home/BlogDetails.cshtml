@@ -1,0 +1,35 @@
+@model RIAYA.Models.HealthBlog
+@{
+    ViewData["Title"] = Model.Title;
+}
+@section Style {
+    <link rel="stylesheet" href="~/css/blogDetails.css" asp-append-version="true" />
+}
+
+<div class="blog-details-container">
+    <div class="blog-header">
+        <div class="blog-meta">
+            <span class="blog-date">@Model.PublishDate?.ToString("dd MMM, yyyy")</span>
+        </div>
+        <h1 class="blog-title">@Model.Title</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ContentUrl))
+    {
+        <div class="blog-image">
+            <img src="~/images/@Model.ContentUrl" alt="@Model.Title" />
+        </div>
+    }
+
+    <div class="blog-content">
+        <div class="content-wrapper">
+            @Html.Raw(Model.Content)
+        </div>
+    </div>
+
+    <div class="back-button">
+        <a href="/Home/KnowledgeCapsule" class="btn-back">
+            <span>&larr;</span> Back to Knowledge Capsules
+        </a>
+    </div>
+</div> 

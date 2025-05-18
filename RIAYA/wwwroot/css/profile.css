@@ -29,10 +29,11 @@ body {
 .navbar {
     position: static;
 }
-.center{
-    margin:auto;
 
+.center {
+    margin: auto;
 }
+
 .content-wrapper {
     display: flex;
     justify-content: center;
@@ -41,7 +42,7 @@ body {
 .flex {
     display: flex;
     gap: 30px;
-    flex-direction:column;
+    flex-direction: column;
 }
 
 .ProfileImg {
@@ -85,7 +86,7 @@ p#name {
         border-radius: 0.3125em;
         margin-bottom: 0.625em;
         box-sizing: border-box;
-/*        margin: auto;*/
+        /*        margin: auto;*/
     }
 
 #buttonn {
@@ -101,10 +102,10 @@ p#name {
 }
 
 #buttonn {
-/*    position: relative;
+    /*    position: relative;
     left: 65em;
     top: 0.5em;*/
-    cursor:pointer !important;
+    cursor: pointer !important;
 }
 
 .divs {
@@ -363,7 +364,7 @@ p {
         flex-direction: column;
         flex-wrap: wrap;
         justify-content: space-evenly;
-/*        width: 20em !important;*/
+        /*        width: 20em !important;*/
     }
 
     input#cancel {
@@ -456,5 +457,135 @@ p {
 @media (min-width: 992px) {
     .modal-lg, .modal-xl {
         max-width: 1300px;
+    }
+}
+
+/* View Bookings Modal Styles */
+#viewBookingsModal .modal-content {
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+}
+
+#viewBookingsModal .modal-header {
+    background-color: #053D76;
+    color: #FFFFFF;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 1rem 1.5rem;
+}
+
+    #viewBookingsModal .modal-header .btn-close {
+        color: #FFFFFF;
+        filter: brightness(0) invert(1);
+    }
+
+#viewBookingsModal .nav-tabs {
+    border-bottom: 2px solid #E6F0FF;
+    margin-bottom: 1rem;
+}
+
+    #viewBookingsModal .nav-tabs .nav-link {
+        color: #053D76;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        #viewBookingsModal .nav-tabs .nav-link:hover {
+            background-color: #E6F0FF;
+            border: none;
+        }
+
+        #viewBookingsModal .nav-tabs .nav-link.active {
+            color: #053D76;
+            background-color: #E6F0FF;
+            border: none;
+            border-bottom: 3px solid #053D76;
+        }
+
+#viewBookingsModal .table {
+    color: #053D76;
+}
+
+    #viewBookingsModal .table thead th {
+        background-color: #E6F0FF;
+        color: #053D76;
+        font-weight: 600;
+        border-bottom: 2px solid #053D76;
+        padding: 1rem;
+    }
+
+    #viewBookingsModal .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+#viewBookingsModal .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #FFFFFF;
+}
+
+#viewBookingsModal .table-striped tbody tr:nth-of-type(even) {
+    background-color: #E6F0FF;
+}
+
+#viewBookingsModal .btn-danger {
+    background-color: #053D76;
+    border: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+    #viewBookingsModal .btn-danger:hover {
+        background-color: #042c54;
+        transform: translateY(-2px);
+    }
+
+#viewBookingsModal .text-muted {
+    color: #053D76 !important;
+}
+
+/* Status Badge Styles */
+#viewBookingsModal .status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+#viewBookingsModal .status-pending {
+    background-color: #E6F0FF;
+    color: #053D76;
+}
+
+#viewBookingsModal .status-confirmed {
+    background-color: #E6F0FF;
+    color: #053D76;
+}
+
+#viewBookingsModal .status-completed {
+    background-color: #E6F0FF;
+    color: #053D76;
+}
+
+#viewBookingsModal .status-cancelled {
+    background-color: #E6F0FF;
+    color: #053D76;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    #viewBookingsModal .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    #viewBookingsModal .table-responsive {
+        margin: 0 -1rem;
+    }
+
+    #viewBookingsModal .nav-tabs .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
     }
 }

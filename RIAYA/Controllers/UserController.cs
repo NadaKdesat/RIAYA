@@ -436,9 +436,9 @@ namespace RIAYA.Controllers
                 {
                     Id = i.Id,
                     ServiceName = i.ServiceName,
-                    AppointmentDateTime = i.CreatedAt ?? DateTime.MinValue,
+                    AppointmentDateTime = DateTime.Now.AddYears(1),
                     Location = $"{i.BuildingName}, {i.StreetName}",
-                    Status = i.IsConfirmed == true ? "Confirmed" : "Pending",
+                    Status = "Pending",
                     BookingType = "InstantHomeCareAppointment",
                     CanCancel = (i.CreatedAt ?? DateTime.MinValue) > DateTime.Now
                 }).ToListAsync();

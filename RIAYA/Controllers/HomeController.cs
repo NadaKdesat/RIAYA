@@ -19,7 +19,7 @@ namespace RIAYA.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("IsLoggedIn")) && Request.Cookies.ContainsKey("IsLoggedIn"))
             {
@@ -41,6 +41,28 @@ namespace RIAYA.Controllers
                 }
             }
 
+            // Get the latest 8 blogs
+            var latestBlogs = _context.HealthBlogs
+                .OrderByDescending(b => b.PublishDate)
+                .Take(8)
+                .ToList();
+
+            ViewBag.LatestBlogs = latestBlogs;
+
+            int totalUsers = await _context.Users.CountAsync(u => u.UserType == "user");
+
+            // Get total providers
+            int totalProviders = await _context.Providers.CountAsync();
+
+            // Get total appointments (all types)
+            int totalElectronicConsultations = await _context.ElectronicConsultations.CountAsync();
+            int totalInstantHomeCareAppointments = await _context.InstantHomeCareAppointments.CountAsync();
+            int totalHomeCareAppointments = await _context.HomeCareAppointments.CountAsync();
+            int totalAppointments = totalElectronicConsultations + totalInstantHomeCareAppointments + totalHomeCareAppointments;
+
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.TotalProviders = totalProviders;
+            ViewBag.TotalAppointments = totalAppointments;
             return View();
         }
 
@@ -106,6 +128,18 @@ namespace RIAYA.Controllers
         {
             var blogs = _context.HealthBlogs.OrderByDescending(b => b.PublishDate).ToList();
             return View(blogs);
+        }
+
+        public async Task<IActionResult> BlogDetails(int id)
+        {
+            var blog = await _context.HealthBlogs.FindAsync(id);
+
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+            return View(blog);
         }
     }
 }

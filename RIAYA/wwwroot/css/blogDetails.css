@@ -1,0 +1,121 @@
+body {
+    background-color: #E6F0FF;
+    font-family: 'Lato', sans-serif;
+}
+
+.blog-details-container {
+    max-width: 1000px;
+    margin: 100px auto 50px;
+    padding: 0 20px;
+}
+
+.blog-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.blog-meta {
+    margin-bottom: 20px;
+}
+
+.blog-date {
+    background: #FFFFFF;
+    color: #053D76;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 4px 12px;
+    display: inline-block;
+}
+
+.blog-title {
+    color: #053D76;
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.blog-image {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 40px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(5, 61, 118, 0.16);
+}
+
+.blog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blog-content {
+    background: #FFFFFF;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(5, 61, 118, 0.08);
+}
+
+.content-wrapper {
+    color: #053D76;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.content-wrapper p {
+    margin-bottom: 20px;
+}
+
+.back-button {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    color: #053D76;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 12px 24px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(5, 61, 118, 0.08);
+}
+
+.btn-back:hover {
+    background: #053D76;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 24px rgba(5, 61, 118, 0.16);
+}
+
+.btn-back span {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+@media screen and (max-width: 768px) {
+    .blog-details-container {
+        margin-top: 80px;
+    }
+
+    .blog-title {
+        font-size: 2rem;
+    }
+
+    .blog-image {
+        height: 300px;
+    }
+
+    .blog-content {
+        padding: 30px 20px;
+    }
+
+    .content-wrapper {
+        font-size: 1rem;
+    }
+} 

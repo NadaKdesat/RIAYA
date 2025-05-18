@@ -39,7 +39,7 @@
                     <div class="blog-desc">
                         @(blog.Content?.Length > 110 ? blog.Content.Substring(0, 110) + "..." : blog.Content)
                     </div>
-                    <a class="blog-readmore" href="#">Read More &rarr;</a>
+                    <a class="blog-readmore" href="/Home/BlogDetails/@blog.Id">Read More &rarr;</a>
                 </div>
             </div>
         }
